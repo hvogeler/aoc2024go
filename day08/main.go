@@ -20,6 +20,16 @@ func main() {
     for scanner.Scan() {
         i++
         line := scanner.Text()
-        fmt.Printf("%3d %s\n", i, line)
+        // fmt.Printf("%3d %s\n", i, line)
+        chars := []rune(line)
+        for i := 0; i < len(chars); i++ {
+            if chars[i] != '.' {
+                fmt.Printf("%c", chars[i])
+            } else {
+                fmt.Print(".")
+            }
+        }
+        fmt.Println("")
     }
+
 }
