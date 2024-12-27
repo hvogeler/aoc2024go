@@ -24,6 +24,22 @@ const ANTINODE = '#'
 type CityMap struct {
     antennas []Antenna
     dimensions MapDimensions
+    antennasByFrequency map[rune][]Antenna
+    linesByAntenna map[Antenna][]GeoLine
+}
+
+func (cityMap *CityMap) createLines() {
+    cityMap.linesByAntenna = make(map[Antenna][]GeoLine)
+    for freq := range cityMap.antennasByFrequency {
+        antennas := cityMap.antennasByFrequency[freq]
+        for i := 0; i < len(antennas) - 1; i++ {
+            lines := make([]GeoLine, 0)
+            for j := i + 1; j < len(antennas); j++ {
+                lines = append(lines, GeoLine { antennas[i], antennas[j]})
+            }
+            cityMap.linesByAntenna[antennas[i]] = lines
+        } 
+    }
 }
 
 func (cityMap CityMap) getAntennaAt(location Location) *Antenna {
@@ -51,12 +67,24 @@ func (cityMap CityMap) String() string {
     return result
 }
 
+func (cityMap *CityMap) addAntenna(antenna Antenna) {
+    cityMap.antennas = append(cityMap.antennas, antenna)
+    antennas, exists := cityMap.antennasByFrequency[antenna.frequency]
+    if !exists {
+        antennas = make([]Antenna, 0)
+    }
+
+    if cityMap.antennasByFrequency == nil {
+        cityMap.antennasByFrequency = make(map[rune][]Antenna)
+    }
+    cityMap.antennasByFrequency[antenna.frequency] = append(antennas, antenna)
+}
+
 func cityMapFromStr(s string) CityMap {
     var cityMap CityMap
     scanner := bufio.NewScanner(strings.NewReader(s))
     row := 0
     var mapDims MapDimensions
-    var antennas []Antenna
     for scanner.Scan() {
         line := scanner.Text()
         if row == 0 {
@@ -70,13 +98,12 @@ func cityMapFromStr(s string) CityMap {
         for col := 0; col < len(runes); col++ {
             currentRune := runes[col]
             if currentRune != '.' && currentRune != '#' {
-                antennas = append(antennas, Antenna{ currentRune, Location{ row, col }})
+                cityMap.addAntenna(Antenna{ currentRune, Location{ row, col }})
             } 
         }
         row++
     }
     mapDims.rows = row
-    cityMap.antennas = antennas
     cityMap.dimensions = mapDims
     return cityMap
 }
@@ -84,6 +111,16 @@ func cityMapFromStr(s string) CityMap {
 type Antenna struct {
     frequency rune
     location Location
+}
+
+type GeoLine struct {
+    a Antenna
+    b Antenna
+}
+
+type Distance struct {
+    rows int64
+    cols int64
 }
 
 type Location struct {
