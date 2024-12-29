@@ -124,7 +124,7 @@ func (cityMap *CityMap) addAntenna(antenna Antenna) {
 	cityMap.antennasByFrequency[antenna.frequency] = append(antennas, antenna)
 }
 
-func cityMapFromStr(s string) CityMap {
+func CityMapFromStr(s string) CityMap {
 	var cityMap CityMap
 	scanner := bufio.NewScanner(strings.NewReader(s))
 	row := 0

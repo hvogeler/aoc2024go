@@ -20,7 +20,7 @@ func Test_CityMap(t *testing.T) {
 ..........#.
 `
 	t.Run("createCityMap", func(t *testing.T) {
-		cityMap := cityMapFromStr(testdata)
+		cityMap := CityMapFromStr(testdata)
 		if cityMap.dimensions.rows != 12 {
 			t.Errorf("Rows wrong. Expected %d, got %d", 12, cityMap.dimensions.rows)
 		}
@@ -38,7 +38,7 @@ func Test_CityMap(t *testing.T) {
 	})
 
 	t.Run("createLines", func(t *testing.T) {
-		cityMap := cityMapFromStr(testdata)
+		cityMap := CityMapFromStr(testdata)
 		cityMap.createLines()
 		if len(cityMap.linesByAntenna) != 5 {
 			t.Errorf("length of linesByAntenna should be 5, but is %d", len(cityMap.linesByAntenna))
