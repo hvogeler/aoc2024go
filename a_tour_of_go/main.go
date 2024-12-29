@@ -20,14 +20,14 @@ func Sqrt(x float64) float64 {
 }
 
 func main() {
-	fmt.Println(Sqrt((2)))
-	p1 := Person { "Heiko", 62 }
-	p2 := Person { "Doris", 66 }
+	m := map[string]string {
+		"key1": "val1",
+		"key2": "v2",
+	}
 
-	fmt.Println(p1)
-	fmt.Println(p2)
-
-	PrintAge(p1)
+	for k,v := range m {
+		fmt.Println(k,v)
+	}
 
 }
 

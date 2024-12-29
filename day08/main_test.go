@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func Test_CityMap(t *testing.T) {
 	testdata := `......#....#
@@ -24,22 +27,29 @@ func Test_CityMap(t *testing.T) {
 		if cityMap.dimensions.cols != 12 {
 			t.Errorf("Cols wrong. Expected %d, got %d", 12, cityMap.dimensions.cols)
 		}
-        
-        if len(cityMap.antennasByFrequency) != 2 {
-            t.Errorf("length of antennasByFrequency should be %d, but is %d", 2, len(cityMap.antennasByFrequency))
-        }
 
-        if len(cityMap.antennasByFrequency['A']) != 3 {
-            t.Errorf("Expected 3 antennas A, but got %d", len(cityMap.antennasByFrequency['A']))
-        }
+		if len(cityMap.antennasByFrequency) != 2 {
+			t.Errorf("length of antennasByFrequency should be %d, but is %d", 2, len(cityMap.antennasByFrequency))
+		}
+
+		if len(cityMap.antennasByFrequency['A']) != 3 {
+			t.Errorf("Expected 3 antennas A, but got %d", len(cityMap.antennasByFrequency['A']))
+		}
 	})
 
-    t.Run("createLines", func(t *testing.T) {
+	t.Run("createLines", func(t *testing.T) {
 		cityMap := cityMapFromStr(testdata)
-        cityMap.createLines()
-        if len(cityMap.linesByAntenna) != 5 {
-            t.Errorf("length of linesByAntenna should be 5, but is %d", len(cityMap.linesByAntenna))
-        }
+		cityMap.createLines()
+		if len(cityMap.linesByAntenna) != 5 {
+			t.Errorf("length of linesByAntenna should be 5, but is %d", len(cityMap.linesByAntenna))
+		}
+		cityMap.linesByAntenna = nil
+		cityMap.CreateAntinodes()
+		fmt.Printf("Number of Antinodes: %d\n", len(cityMap.antinodes()))
+		fmt.Println(cityMap.antinodes())
+		if len(cityMap.antinodes()) != 14 {
+			t.Errorf("Expected 14 Antinodes, but got %d", len(cityMap.antinodes()))
+		}
 	})
 }
 
