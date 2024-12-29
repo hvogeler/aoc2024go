@@ -1,3 +1,3 @@
-module day08
+module main
 
 go 1.23.4

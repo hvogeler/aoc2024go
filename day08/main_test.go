@@ -37,11 +37,29 @@ func Test_CityMap(t *testing.T) {
     t.Run("createLines", func(t *testing.T) {
 		cityMap := cityMapFromStr(testdata)
         cityMap.createLines()
-        if len(cityMap.linesByAntenna) != 2 {
-            t.Errorf("length of linesByAntenna should be 2, but is %d", len(cityMap.linesByAntenna))
+        if len(cityMap.linesByAntenna) != 5 {
+            t.Errorf("length of linesByAntenna should be 5, but is %d", len(cityMap.linesByAntenna))
         }
 	})
 }
+
+// fn create_antinodes(&mut self) {
+//     for line in self.lines_by_antennas.values().flat_map(|it| it) {
+//         let d = line.distance();
+//         println!("{:?}, distance: {}", line, d);
+//         let mut antinodes: Vec<Location> = Vec::new();
+//         antinodes.push(Location::new(line.a.location.row - (d.rows as i64), line.a.location.col - (d.cols as i64)));
+//         antinodes.push(Location::new(line.a.location.row + (d.rows as i64), line.a.location.col + (d.cols as i64)));
+//         antinodes.push(Location::new(line.b.location.row - (d.rows as i64), line.b.location.col - (d.cols as i64)));
+//         antinodes.push(Location::new(line.b.location.row + (d.rows as i64), line.b.location.col + (d.cols as i64)));
+//         let antinodes: Vec<Location> = antinodes
+//             .into_iter()
+//             .filter(|node| *node != line.a.location && *node != line.b.location)
+//             .collect();
+//         println!("Antinode canidates: {:?}\n\n", antinodes);
+//         self.antinodes_by_line.insert(line.clone(), antinodes.clone());
+//     }
+// }
 
 // fn create_lines(&mut self) {
 //     self.lines_by_antennas.clear();
