@@ -19,6 +19,44 @@ func Test_CityMap(t *testing.T) {
 ..........#.
 ..........#.
 `
+	testdata2 := `T....#....
+...T......
+.T....#...
+.........#
+..#.......
+..........
+...#......
+..........
+....#.....
+..........
+`
+
+	t.Run("createAntinodesPart2", func(t *testing.T) {
+		cityMap := CityMapFromStr(testdata2)
+		cityMap.CreateAntinodes2()
+
+		antinodes := cityMap.antinodes()
+		if len(antinodes) != 9 {
+			t.Errorf("Expected 9 Antinodes, got %d: %v", len(antinodes), antinodes)
+		}
+
+		expectedAntinodes := []Location{{0, 5}, {3, 9}, {4, 2}, {8, 4}}
+		for _, expectedAntinode := range expectedAntinodes {
+			if !cityMap.isAntinode(&expectedAntinode) {
+				t.Errorf("Expected %v to be an Antinode, but it is not", expectedAntinode)
+			}
+		}
+
+		cityMap = CityMapFromStr(testdata)
+		cityMap.CreateAntinodes2()
+
+		antinodes = cityMap.antinodes()
+		if len(antinodes) != 34 {
+			t.Errorf("Expected 34 Antinodes, got %d: %v", len(antinodes), antinodes)
+		}
+
+	})
+
 	t.Run("createCityMap", func(t *testing.T) {
 		cityMap := CityMapFromStr(testdata)
 		if cityMap.dimensions.rows != 12 {

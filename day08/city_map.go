@@ -35,6 +35,15 @@ func (cityMap CityMap) antinodes() []Location {
 	return getMapKeys(antinodeSet)
 }
 
+func (cityMap CityMap) isAntinode(antinodeCandidate *Location) bool {
+	for _, antinode := range cityMap.antinodes() {
+		if *antinodeCandidate == antinode {
+			return true
+		}
+	}
+	return false
+}
+
 func (cityMap CityMap) lines() []GeoLine {
 	return flattenArray(getMapValues(cityMap.linesByAntenna))
 }
@@ -66,6 +75,37 @@ func (cityMap *CityMap) CreateAntinodes() {
 		cityMap.validateAddAntinode(antinodeSet, line, Location{line.b.location.row - d.rows, line.b.location.col - d.cols})
 		cityMap.validateAddAntinode(antinodeSet, line, Location{line.b.location.row + d.rows, line.b.location.col + d.cols})
 		cityMap.antinodesByLine[line] = getMapKeys(antinodeSet)
+	}
+}
+
+func (cityMap *CityMap) CreateAntinodes2() {
+	if cityMap.linesByAntenna == nil {
+		cityMap.createLines()
+	}
+	cityMap.antinodesByLine = make(map[GeoLine][]Location)
+	for _, line := range cityMap.lines() {
+		antinodeSet := make(map[Location]bool, 0)
+		d := line.Distance()
+		atLeastOneAntinodeOnMap := true
+		for i := 1; atLeastOneAntinodeOnMap; i++ {
+			atLeastOneAntinodeOnMap = false
+			antinodeCandidate := Location{line.a.location.row + (i * -d.rows), line.a.location.col + (i * -d.cols)}
+			cityMap.validateAndAddAntinode2(antinodeSet, antinodeCandidate, &atLeastOneAntinodeOnMap)
+			antinodeCandidate = Location{line.a.location.row + (i * d.rows), line.a.location.col + (i * d.cols)}
+			cityMap.validateAndAddAntinode2(antinodeSet, antinodeCandidate, &atLeastOneAntinodeOnMap)
+			antinodeCandidate = Location{line.b.location.row + (i * -d.rows), line.b.location.col + (i * -d.cols)}
+			cityMap.validateAndAddAntinode2(antinodeSet, antinodeCandidate, &atLeastOneAntinodeOnMap)
+			antinodeCandidate = Location{line.b.location.row + (i * d.rows), line.b.location.col + (i * d.cols)}
+			cityMap.validateAndAddAntinode2(antinodeSet, antinodeCandidate, &atLeastOneAntinodeOnMap)
+		}
+		cityMap.antinodesByLine[line] = getMapKeys(antinodeSet)
+	}
+}
+
+func (cityMap CityMap) validateAndAddAntinode2(antinodeSet  map[Location]bool, antinodeCandidate Location, atLeastOneAntinodeOnMap *bool) {
+	if cityMap.isLocationWithinCity(antinodeCandidate) {
+		*atLeastOneAntinodeOnMap = true
+		antinodeSet[antinodeCandidate] = true
 	}
 }
 
