@@ -1,24 +1,42 @@
 package main
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func Test_Disk(t *testing.T) {
+	t.Run("FromDiskMap", func(t *testing.T) {
+		// testdata := DiskMap("12345")
+		
+		testdata := DiskMap("2333133121414131402")
+		disk := FromDiskMap(&testdata)
+		disk.Compress()
+		cs := disk.Checksum()
+		fmt.Println("Checksum = ", cs)
+	})
 
 	t.Run("FromDiskMap", func(t *testing.T) {
 		testdata := DiskMap("12345")
 		disk := FromDiskMap(&testdata)
-		if len(disk.files) != 3 {
-			t.Errorf("Expected 3 files, got %d", len(disk.files))
+		if len(disk.fileBlocks) != 3 {
+			t.Errorf("Expected 3 files, got %d", len(disk.fileBlocks))
 		}
 		if len(disk.freeBlocks) != 2 {
 			t.Errorf("Expected 2 free blocks, got %d", len(disk.freeBlocks))
 		}
 		f := File{2, 10, 5}
-		if disk.files[2] != f {
-			t.Errorf("Expected file %v, got %v", f, disk.files[2])
+		if disk.fileBlocks[2] != f {
+			t.Errorf("Expected file %v, got %v", f, disk.fileBlocks[2])
+		}
+		if disk.SpaceFree() != 6 {
+			t.Errorf("Expected 6 blocks free space, got %d", disk.SpaceFree())
+		}
+		if disk.SpaceUsed() != 9 {
+			t.Errorf("Expected 9 blocks used space, got %d", disk.SpaceUsed())
+		}
+		if disk.SpaceTotal() != 15 {
+			t.Errorf("Expected 15 blocks total disk space, got %d", disk.SpaceTotal())
 		}
 		fmt.Println(disk)
 
