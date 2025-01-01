@@ -7,17 +7,21 @@ import (
 )
 
 func main() {
-	bytes, err := os.ReadFile("example2.dat")
+	bytes, err := os.ReadFile("testdata.dat")
 	data := DiskMap(bytes)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Data: ", data)
+	// fmt.Println("Data: ", data)
 
 	disk := FromDiskMap(&data)
 	disk.Compress()
 	cs := disk.Checksum()
 	fmt.Printf("Part1 Checksum: %d", cs)
+    if cs != 6360094256423 {
+        panic("Wrong result")
+    }
+
 }
 
 type DiskMap string
@@ -38,20 +42,37 @@ func (disk *Disk) Checksum() uint {
 }
 
 func (disk *Disk) Compress() {
-	for disk.SpaceFree() > 0 && disk.maxStartFreeBlock() < disk.maxStartFileBlock() {
-		fmt.Println(disk.SpaceFree())
+	for disk.minStartFreeBlock() < disk.maxStartFileBlock() {
 		lastFile := len(disk.fileBlocks) - 1
 		if disk.freeBlocks[0].blocks <= disk.fileBlocks[lastFile].blocks {
 			disk.fileBlocks[lastFile].blocks -= disk.freeBlocks[0].blocks
 			disk.fileBlocks = append(disk.fileBlocks[:1], append([]File{{disk.fileBlocks[lastFile].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[1:]...)...)
+            if disk.fileBlocks[lastFile].blocks == 0 {
+                disk.fileBlocks = disk.fileBlocks[:len(disk.fileBlocks) - 1]
+            }
+            disk.freeBlocks[len(disk.freeBlocks) - 1].blocks += disk.freeBlocks[0].blocks
 			disk.freeBlocks = disk.freeBlocks[1:]
 		} else {
 			disk.freeBlocks[0].blocks -= disk.fileBlocks[lastFile].blocks
+            disk.freeBlocks[len(disk.freeBlocks) - 1].blocks += disk.fileBlocks[lastFile].blocks
 			disk.fileBlocks[lastFile].start = disk.freeBlocks[0].start
-			disk.freeBlocks[0].start += (disk.fileBlocks[lastFile].blocks - 1)
+			disk.freeBlocks[0].start += (disk.fileBlocks[lastFile].blocks)
+            if disk.fileBlocks[lastFile].blocks == 0 {
+                disk.fileBlocks = disk.fileBlocks[:len(disk.fileBlocks) - 1]
+            }
 		}
+        // here for debugging. Move it out of the loop for prod
+        disk.SortFilesByStart()
 	}
-	disk.SortFilesByStart()
+}
+
+func (disk Disk) isFileBlock(blockPos uint) bool {
+    for _, fileBlock := range disk.fileBlocks {
+        if blockPos >= fileBlock.start && blockPos < fileBlock.start + fileBlock.blocks {
+            return true
+        }
+    }
+    return false
 }
 
 func (disk Disk) maxStartFreeBlock() uint {
@@ -62,6 +83,16 @@ func (disk Disk) maxStartFreeBlock() uint {
 		}
 	}
 	return max
+}
+
+func (disk Disk) minStartFreeBlock() uint {
+	min := ^uint(0)
+	for _, freeBlock := range disk.freeBlocks {
+		if freeBlock.start < min {
+			min = freeBlock.start
+		}
+	}
+	return min
 }
 
 func (disk Disk) maxStartFileBlock() uint {
