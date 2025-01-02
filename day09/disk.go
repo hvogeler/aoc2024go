@@ -147,7 +147,22 @@ func (disk Disk) SpaceTotal() uint {
 }
 
 func (disk Disk) String() string {
-	return fmt.Sprintf("Disk Layout:\n   Free Blocks: %v\n   File Blocks: %v", disk.freeBlocks, disk.fileBlocks)
+	allBlocks := append(disk.fileBlocks, disk.freeBlocks...)
+	sort.Slice(allBlocks, func(i, j int) bool {
+		return allBlocks[i].start < allBlocks[j].start
+	})
+	diskMap := ""
+	for _, block := range allBlocks {
+		for i := 0; i < int(block.blocks); i++ {
+			if block.usage == File {
+				diskMap += fmt.Sprintf("%d", block.id)
+			} else {
+				diskMap += "."
+			}
+		}
+	}
+	return diskMap
+	// return fmt.Sprintf("Disk Layout:\n   Free Blocks: %v\n   File Blocks: %v", disk.freeBlocks, disk.fileBlocks)
 }
 
 func FromDiskMap(diskMap *DiskMap) Disk {
