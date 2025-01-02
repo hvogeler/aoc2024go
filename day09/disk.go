@@ -104,12 +104,6 @@ Loop:
 	disk.fileBlocks = append(disk.fileBlocks[:to], append([]BlockRange{{File, disk.fileBlocks[lastFileIdx].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[to:]...)...)
 }
 
-// func (disk *Disk) moveLastFileTo(to int) {
-// 	lastFileIdx := len(disk.fileBlocks) - 1
-// 	disk.fileBlocks[lastFileIdx].blocks -= disk.freeBlocks[0].blocks
-// 	disk.fileBlocks = append(disk.fileBlocks[:to], append([]File{{disk.fileBlocks[lastFileIdx].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[to:]...)...)
-// }
-
 func (disk *Disk) removeEmptyLastFileBlock() {
 	lastFileIdx := len(disk.fileBlocks) - 1
 	if disk.fileBlocks[lastFileIdx].blocks == 0 {
@@ -120,25 +114,6 @@ func (disk *Disk) removeEmptyLastFileBlock() {
 func (disk Disk) isFreeBlockBetweenFiles() bool {
 	return disk.minStartFreeBlock() < disk.maxStartFileBlock()
 }
-
-// func (disk Disk) isFileBlock(blockPos uint) bool {
-// 	for _, fileBlock := range disk.fileBlocks {
-// 		if blockPos >= fileBlock.start && blockPos < fileBlock.start+fileBlock.blocks {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
-
-// func (disk Disk) maxStartFreeBlock() uint {
-// 	max := uint(0)
-// 	for _, freeBlock := range disk.freeBlocks {
-// 		if freeBlock.start > max {
-// 			max = freeBlock.start
-// 		}
-// 	}
-// 	return max
-// }
 
 func (disk Disk) minStartFreeBlock() uint {
 	min := ^uint(0)
@@ -208,7 +183,6 @@ func (disk Disk) String() string {
 		}
 	}
 	return diskMap
-	// return fmt.Sprintf("Disk Layout:\n   Free Blocks: %v\n   File Blocks: %v", disk.freeBlocks, disk.fileBlocks)
 }
 
 func FromDiskMap(diskMap *DiskMap) Disk {
