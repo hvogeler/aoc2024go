@@ -36,6 +36,4 @@ func Test_HikingMap(t *testing.T) {
 		}
 	})
 
-
-
 }
