@@ -8,7 +8,7 @@ import (
 func Test_Disk(t *testing.T) {
 	t.Run("FromDiskMap", func(t *testing.T) {
 		// testdata := DiskMap("12345")
-		
+
 		testdata := DiskMap("2333133121414131402")
 		disk := FromDiskMap(&testdata)
 		disk.Compress()
@@ -25,7 +25,7 @@ func Test_Disk(t *testing.T) {
 		if len(disk.freeBlocks) != 2 {
 			t.Errorf("Expected 2 free blocks, got %d", len(disk.freeBlocks))
 		}
-		f := File{2, 10, 5}
+		f := BlockRange{File, 2, 10, 5}
 		if disk.fileBlocks[2] != f {
 			t.Errorf("Expected file %v, got %v", f, disk.fileBlocks[2])
 		}

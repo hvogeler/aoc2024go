@@ -8,8 +8,8 @@ import (
 type DiskMap string
 
 type Disk struct {
-	freeBlocks []Free
-	fileBlocks []File
+	freeBlocks []BlockRange
+	fileBlocks []BlockRange
 }
 
 func (disk *Disk) Checksum() uint {
@@ -52,16 +52,16 @@ func (disk *Disk) moveFreeBlocksToEnd() {
 
 func (disk *Disk) moveLastFileToFreePosition() {
 	to := 0
-	Loop:
-	for ;to < len(disk.fileBlocks); to++ {
+Loop:
+	for ; to < len(disk.fileBlocks); to++ {
 		if disk.freeBlocks[0].start < disk.fileBlocks[to].start {
 			break Loop
 		}
 	}
-	
+
 	lastFileIdx := len(disk.fileBlocks) - 1
 	disk.fileBlocks[lastFileIdx].blocks -= disk.freeBlocks[0].blocks
-	disk.fileBlocks = append(disk.fileBlocks[:to], append([]File{{disk.fileBlocks[lastFileIdx].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[to:]...)...)
+	disk.fileBlocks = append(disk.fileBlocks[:to], append([]BlockRange{{File, disk.fileBlocks[lastFileIdx].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[to:]...)...)
 }
 
 // func (disk *Disk) moveLastFileTo(to int) {
@@ -158,10 +158,10 @@ func FromDiskMap(diskMap *DiskMap) Disk {
 	for i, blocksize := range blocksizes {
 		if i%2 == 1 {
 			// free blocks
-			disk.freeBlocks = append(disk.freeBlocks, Free{currentPosition, blocksize})
+			disk.freeBlocks = append(disk.freeBlocks, BlockRange{Empty, EmptyBlockId, currentPosition, blocksize})
 		} else {
 			// file blocks
-			disk.fileBlocks = append(disk.fileBlocks, File{id, currentPosition, blocksize})
+			disk.fileBlocks = append(disk.fileBlocks, BlockRange{File, id, currentPosition, blocksize})
 			id++
 		}
 		currentPosition += blocksize
@@ -179,21 +179,32 @@ func toNumberSlice(diskMap *DiskMap) []uint {
 	return result
 }
 
-type File struct {
+type Usage uint
+
+const (
+	Empty Usage = iota
+	File
+)
+
+func (usage Usage) String() string {
+	switch usage {
+	case Empty:
+		return "Empty"
+	case File:
+		return "File"
+	}
+	panic("Unknown Block usage")
+}
+
+const EmptyBlockId = uint(0)
+
+type BlockRange struct {
+	usage  Usage
 	id     uint
 	start  uint // start of the block
 	blocks uint // disk blocks occupied by file
 }
 
-func (f File) String() string {
-	return fmt.Sprintf("ID(%2d) Start(%3d) Blocks(%3d)\n", f.id, f.start, f.blocks)
-}
-
-type Free struct {
-	start  uint
-	blocks uint
-}
-
-func (free Free) String() string {
-	return fmt.Sprintf("Start(%3d) Blocks(%3d)\n", free.start, free.blocks)
+func (f BlockRange) String() string {
+	return fmt.Sprintf("Type(%s) ID(%2d) Start(%3d) Blocks(%3d)\n", f.usage, f.id, f.start, f.blocks)
 }
