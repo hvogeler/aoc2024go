@@ -18,9 +18,9 @@ func main() {
 	disk.Compress()
 	cs := disk.Checksum()
 	fmt.Printf("Part1 Checksum: %d", cs)
-    if cs != 6360094256423 {
-        panic("Wrong result")
-    }
+	if cs != 6360094256423 {
+		panic("Wrong result")
+	}
 
 }
 
@@ -34,56 +34,90 @@ type Disk struct {
 func (disk *Disk) Checksum() uint {
 	checkSum := uint(0)
 	for _, file := range disk.fileBlocks {
-		for blockPos := file.start; blockPos < file.start + file.blocks; blockPos++ {
+		for blockPos := file.start; blockPos < file.start+file.blocks; blockPos++ {
 			checkSum += (uint(blockPos) * file.id)
 		}
 	}
 	return checkSum
 }
 
+// move file blocks one at a time from the end of the disk to the leftmost free space block
+// until there are no gaps remaining between file blocks
 func (disk *Disk) Compress() {
-	for disk.minStartFreeBlock() < disk.maxStartFileBlock() {
-		lastFile := len(disk.fileBlocks) - 1
-		if disk.freeBlocks[0].blocks <= disk.fileBlocks[lastFile].blocks {
-			disk.fileBlocks[lastFile].blocks -= disk.freeBlocks[0].blocks
-			disk.fileBlocks = append(disk.fileBlocks[:1], append([]File{{disk.fileBlocks[lastFile].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[1:]...)...)
-            if disk.fileBlocks[lastFile].blocks == 0 {
-                disk.fileBlocks = disk.fileBlocks[:len(disk.fileBlocks) - 1]
-            }
-            disk.freeBlocks[len(disk.freeBlocks) - 1].blocks += disk.freeBlocks[0].blocks
-			disk.freeBlocks = disk.freeBlocks[1:]
-		} else {
-			disk.freeBlocks[0].blocks -= disk.fileBlocks[lastFile].blocks
-            disk.freeBlocks[len(disk.freeBlocks) - 1].blocks += disk.fileBlocks[lastFile].blocks
-			disk.fileBlocks[lastFile].start = disk.freeBlocks[0].start
-			disk.freeBlocks[0].start += (disk.fileBlocks[lastFile].blocks)
-            if disk.fileBlocks[lastFile].blocks == 0 {
-                disk.fileBlocks = disk.fileBlocks[:len(disk.fileBlocks) - 1]
-            }
+	for disk.isFreeBlockBetweenFiles() {
+		lastFileIdx := len(disk.fileBlocks) - 1
+		lastFileBlocks := disk.fileBlocks[lastFileIdx].blocks
+		firstFreeBlocks := disk.freeBlocks[0].blocks
+		switch {
+		case lastFileBlocks >= firstFreeBlocks:
+			disk.moveLastFileToFreePosition()
+			disk.removeEmptyLastFileBlock()
+			disk.moveFreeBlocksToEnd()
+		case lastFileBlocks < firstFreeBlocks:
+			disk.freeBlocks[0].blocks -= disk.fileBlocks[lastFileIdx].blocks
+			disk.freeBlocks[len(disk.freeBlocks)-1].blocks += disk.fileBlocks[lastFileIdx].blocks
+			disk.fileBlocks[lastFileIdx].start = disk.freeBlocks[0].start
+			disk.freeBlocks[0].start += (disk.fileBlocks[lastFileIdx].blocks)
+			disk.removeEmptyLastFileBlock()
+			disk.SortFilesByStart()
 		}
-        // here for debugging. Move it out of the loop for prod
-        disk.SortFilesByStart()
 	}
 }
 
-func (disk Disk) isFileBlock(blockPos uint) bool {
-    for _, fileBlock := range disk.fileBlocks {
-        if blockPos >= fileBlock.start && blockPos < fileBlock.start + fileBlock.blocks {
-            return true
-        }
-    }
-    return false
+func (disk *Disk) moveFreeBlocksToEnd() {
+	disk.freeBlocks[len(disk.freeBlocks)-1].blocks += disk.freeBlocks[0].blocks
+	disk.freeBlocks = disk.freeBlocks[1:]
 }
 
-func (disk Disk) maxStartFreeBlock() uint {
-	max := uint(0)
-	for _, freeBlock := range disk.freeBlocks {
-		if freeBlock.start > max {
-			max = freeBlock.start
+func (disk *Disk) moveLastFileToFreePosition() {
+	to := 0
+	Loop:
+	for ;to < len(disk.fileBlocks); to++ {
+		if disk.freeBlocks[0].start < disk.fileBlocks[to].start {
+			break Loop
 		}
 	}
-	return max
+	
+	lastFileIdx := len(disk.fileBlocks) - 1
+	disk.fileBlocks[lastFileIdx].blocks -= disk.freeBlocks[0].blocks
+	disk.fileBlocks = append(disk.fileBlocks[:to], append([]File{{disk.fileBlocks[lastFileIdx].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[to:]...)...)
 }
+
+// func (disk *Disk) moveLastFileTo(to int) {
+// 	lastFileIdx := len(disk.fileBlocks) - 1
+// 	disk.fileBlocks[lastFileIdx].blocks -= disk.freeBlocks[0].blocks
+// 	disk.fileBlocks = append(disk.fileBlocks[:to], append([]File{{disk.fileBlocks[lastFileIdx].id, disk.freeBlocks[0].start, disk.freeBlocks[0].blocks}}, disk.fileBlocks[to:]...)...)
+// }
+
+func (disk *Disk) removeEmptyLastFileBlock() {
+	lastFileIdx := len(disk.fileBlocks) - 1
+	if disk.fileBlocks[lastFileIdx].blocks == 0 {
+		disk.fileBlocks = disk.fileBlocks[:len(disk.fileBlocks)-1]
+	}
+}
+
+func (disk Disk) isFreeBlockBetweenFiles() bool {
+	return disk.minStartFreeBlock() < disk.maxStartFileBlock()
+}
+
+// func (disk Disk) isFileBlock(blockPos uint) bool {
+// 	for _, fileBlock := range disk.fileBlocks {
+// 		if blockPos >= fileBlock.start && blockPos < fileBlock.start+fileBlock.blocks {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
+
+// func (disk Disk) maxStartFreeBlock() uint {
+// 	max := uint(0)
+// 	for _, freeBlock := range disk.freeBlocks {
+// 		if freeBlock.start > max {
+// 			max = freeBlock.start
+// 		}
+// 	}
+// 	return max
+// }
 
 func (disk Disk) minStartFreeBlock() uint {
 	min := ^uint(0)
