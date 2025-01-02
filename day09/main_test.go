@@ -6,11 +6,24 @@ import (
 )
 
 func Test_Disk(t *testing.T) {
+	t.Run("Compress2", func(t *testing.T) {
+		testdata := DiskMap("2333133121414131402")
+		disk := FromDiskMap(&testdata)
+		fmt.Println("Before : ", disk)
+		disk.Compress2()
+		fmt.Println("After  : ", disk)
+		cs := disk.Checksum()
+		fmt.Println("Checksum = ", cs)
+		if cs != 2858 {
+			t.Errorf("Expected Checksum 2858, got: %d", cs)
+		}
+	})
+
 	t.Run("FromDiskMap", func(t *testing.T) {
 		testdata := DiskMap("2333133121414131402")
 		disk := FromDiskMap(&testdata)
 		fmt.Println("Before : ", disk)
-		disk.Compress()
+		disk.Compress1()
 		fmt.Println("After  : ", disk)
 		cs := disk.Checksum()
 		fmt.Println("Checksum = ", cs)
@@ -39,7 +52,7 @@ func Test_Disk(t *testing.T) {
 			t.Errorf("Expected 15 blocks total disk space, got %d", disk.SpaceTotal())
 		}
 		fmt.Println(disk)
-		disk.Compress()
+		disk.Compress1()
 		fmt.Println(disk)
 
 	})

@@ -24,7 +24,7 @@ func (disk *Disk) Checksum() uint {
 
 // move file blocks one at a time from the end of the disk to the leftmost free space block
 // until there are no gaps remaining between file blocks
-func (disk *Disk) Compress() {
+func (disk *Disk) Compress1() {
 	for disk.isFreeBlockBetweenFiles() {
 		lastFileIdx := len(disk.fileBlocks) - 1
 		lastFileBlocks := disk.fileBlocks[lastFileIdx].blocks
@@ -43,6 +43,46 @@ func (disk *Disk) Compress() {
 			disk.SortFilesByStart()
 		}
 	}
+}
+
+func (disk *Disk) Compress2() {
+	for fileBlockIdx := len(disk.fileBlocks) - 1; fileBlockIdx > 0; {
+		fileBlockRange := &disk.fileBlocks[fileBlockIdx]
+		isFileBlockMoved := false
+	InnerLoop:
+		for freeBlockIdx := 0; freeBlockIdx < len(disk.freeBlocks) && disk.isFreeBlocksBeforeFileBlock(freeBlockIdx, fileBlockIdx); freeBlockIdx++ {
+			freeBlockRange := &disk.freeBlocks[freeBlockIdx]
+			if freeBlockRange.blocks >= fileBlockRange.blocks {
+				tmp := *fileBlockRange
+				freeBlockRange.blocks -= fileBlockRange.blocks
+				fileBlockRange.start = freeBlockRange.start
+				tmp.usage = Empty
+				tmp.id = 0
+				disk.freeBlocks = append(disk.freeBlocks, tmp)
+				if freeBlockRange.blocks == 0 {
+					disk.removeFreeBlockRange(freeBlockIdx)
+				} else {
+					freeBlockRange.start = fileBlockRange.start + fileBlockRange.blocks
+				}
+				disk.SortFilesByStart()
+				disk.SortFreeByStart()
+				isFileBlockMoved = true
+				break InnerLoop
+			}
+		}
+		if !isFileBlockMoved {
+			fileBlockIdx--
+		}
+	}
+
+}
+
+func (disk *Disk) removeFreeBlockRange(at int) {
+	disk.freeBlocks = append(disk.freeBlocks[:at], disk.freeBlocks[(at+1):]...)
+}
+
+func (disk Disk) isFreeBlocksBeforeFileBlock(freeBlockIdx int, fileBlockIdx int) bool {
+	return disk.freeBlocks[freeBlockIdx].start < disk.fileBlocks[fileBlockIdx].start
 }
 
 func (disk *Disk) moveFreeBlocksToEnd() {
@@ -123,6 +163,12 @@ func (disk Disk) maxStartFileBlock() uint {
 func (disk *Disk) SortFilesByStart() {
 	sort.Slice(disk.fileBlocks, func(i, j int) bool {
 		return disk.fileBlocks[i].start < disk.fileBlocks[j].start
+	})
+}
+
+func (disk *Disk) SortFreeByStart() {
+	sort.Slice(disk.freeBlocks, func(i, j int) bool {
+		return disk.freeBlocks[i].start < disk.freeBlocks[j].start
 	})
 }
 
