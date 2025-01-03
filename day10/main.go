@@ -22,6 +22,21 @@ func main() {
 		sumAll += sum9
 	}
 	fmt.Println("Sum All = ", sumAll)
+	if sumAll != 459 {
+		panic("Wrong result for Part 1")
+	}
+
+	// Part2
+	sumAll = 0
+	for _, startLocation := range hikingMap.TrailHeads() {
+		sum9 := hikingMap.Walk2(startLocation)
+		fmt.Printf("Start: %s  -  Sum = %d\n", startLocation, sum9)
+		sumAll += sum9
+	}
+	fmt.Println("Sum All = ", sumAll)
+	if sumAll != 1034 {
+		panic("Wrong result for Part 2")
+	}
 
 }
 
@@ -32,11 +47,38 @@ type HikingMap struct {
 }
 
 // Walk the trails and sum the number of peaks the reach
+func (hMap HikingMap) Walk2(start Location) int {
+
+	return hMap.stepFrom2(start, 0)
+}
+
+func (hMap HikingMap) stepFrom2(loc Location, level int) int {
+	if hMap.At(loc) == 9 {
+		return 1
+	}
+
+	// Check for 1 increase in every direction
+	sum_9_heights := 0
+	if hMap.At(loc) == hMap.up(loc) - 1 {
+		sum_9_heights += hMap.stepFrom2(loc.Up(), level + 1)
+	}
+	if hMap.At(loc) == hMap.down(loc) - 1 {
+		sum_9_heights += hMap.stepFrom2(loc.Down(), level + 1)
+	}
+	if hMap.At(loc) == hMap.left(loc) - 1 {
+		sum_9_heights += hMap.stepFrom2(loc.Left(), level + 1)
+	}
+	if hMap.At(loc) == hMap.right(loc) - 1 {
+		sum_9_heights += hMap.stepFrom2(loc.Right(), level + 1)
+	}
+	fmt.Printf("Unwind Recursion Level: %d\n", level)
+	return sum_9_heights
+}
+
 func (hMap HikingMap) Walk(start Location) int {
 	hMap.stepFrom(start, 0)
 	return len(hMap.stepFrom(start, 0))
 }
-
 func (hMap HikingMap) stepFrom(loc Location, level int) []Location {
 	if hMap.At(loc) == 9 {
 		return []Location{loc}

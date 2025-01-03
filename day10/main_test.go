@@ -9,6 +9,113 @@ import (
 
 func Test_HikingMap(t *testing.T) {
 
+	// Part 2 tests
+	t.Run("stepFrom2a", func(t *testing.T) {
+		testData := `.....0.
+..4321.
+..5..2.
+..6543.
+..7..4.
+..8765.
+..9....`
+		hikingMap := FromStr(&testData)
+		if hikingMap.dimensions != (Dimensions{7, 7}) {
+			t.Errorf("Expected 7 rows and 7 cols, got %v", hikingMap.dimensions)
+		}
+
+		startLocation := hikingMap.TrailHeads()[0]
+		if startLocation != (Location{0, 5}) {
+			t.Errorf("Expected Trailhead at (0, 5), got %s", startLocation)
+		}
+
+		sum9 := hikingMap.Walk2(startLocation)
+		fmt.Println("Sum = ", sum9)
+		if sum9 != 3 {
+			t.Errorf("Expected sum9 to be 3, got %d", sum9)
+		}
+	})
+
+	t.Run("stepFrom2b", func(t *testing.T) {
+		testData := `..90..9
+...1.98
+...2..7
+6543456
+765.987
+876....
+987....`
+		hikingMap := FromStr(&testData)
+		if hikingMap.dimensions != (Dimensions{7, 7}) {
+			t.Errorf("Expected 7 rows and 7 cols, got %v", hikingMap.dimensions)
+		}
+
+		sumAll := 0
+		for _, startLocation := range hikingMap.TrailHeads() {
+			sum9 := hikingMap.Walk2(startLocation)
+			fmt.Printf("Start: %s  -  Sum = %d\n", startLocation, sum9)
+			sumAll += sum9
+		}
+		fmt.Println("Sum All = ", sumAll)
+		if sumAll != 13 {
+			t.Errorf("Expected sum to be 13, got %d", sumAll)
+		}
+
+	})
+
+	t.Run("stepFrom2c", func(t *testing.T) {
+		testData := `012345
+123456
+234567
+345678
+4.6789
+56789.`
+		hikingMap := FromStr(&testData)
+		if hikingMap.dimensions != (Dimensions{6, 6}) {
+			t.Errorf("Expected 6 rows and 6 cols, got %v", hikingMap.dimensions)
+		}
+
+		sumAll := 0
+		for _, startLocation := range hikingMap.TrailHeads() {
+			sum9 := hikingMap.Walk2(startLocation)
+			fmt.Printf("Start: %s  -  Sum = %d\n", startLocation, sum9)
+			sumAll += sum9
+		}
+		fmt.Println("Sum All = ", sumAll)
+		if sumAll != 227 {
+			t.Errorf("Expected sum to be 227, got %d", sumAll)
+		}
+
+	})
+
+	t.Run("stepFrom2d", func(t *testing.T) {
+
+		testData := `89010123
+78121874
+87430965
+96549874
+45678903
+32019012
+01329801
+10456732`
+
+		hikingMap := FromStr(&testData)
+		if hikingMap.dimensions != (Dimensions{8, 8}) {
+			t.Errorf("Expected 8 rows and 8 cols, got %v", hikingMap.dimensions)
+		}
+
+		sumAll := 0
+		for _, startLocation := range hikingMap.TrailHeads() {
+			sum9 := hikingMap.Walk2(startLocation)
+			fmt.Printf("Start: %s  -  Sum = %d\n", startLocation, sum9)
+			sumAll += sum9
+		}
+		fmt.Println("Sum All = ", sumAll)
+		if sumAll != 81 {
+			t.Errorf("Expected sum to be 81, got %d", sumAll)
+		}
+
+	})
+
+	// Part 1 tests
 	t.Run("stepFromDupTarget", func(t *testing.T) {
 		testData := `...0...
 ...1...
