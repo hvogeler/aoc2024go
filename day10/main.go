@@ -8,15 +8,20 @@ import (
 )
 
 func main() {
-	bytes, err := os.ReadFile("example1.dat")
+	bytes, err := os.ReadFile("testdata.dat")
 	if err != nil {
 		panic(err)
 	}
 	data := string(bytes)
-	hMap := FromStr(&data)
-	fmt.Println(hMap)
+	hikingMap := FromStr(&data)
 
-	fmt.Println(hMap.TrailHeads())
+	sumAll := 0
+	for _, startLocation := range hikingMap.TrailHeads() {
+		sum9 := hikingMap.Walk(startLocation)
+		fmt.Printf("Start: %s  -  Sum = %d\n", startLocation, sum9)
+		sumAll += sum9
+	}
+	fmt.Println("Sum All = ", sumAll)
 
 }
 
@@ -28,33 +33,50 @@ type HikingMap struct {
 
 // Walk the trails and sum the number of peaks the reach
 func (hMap HikingMap) Walk(start Location) int {
-
-	return hMap.stepFrom(start, 0)
+	hMap.stepFrom(start, 0)
+	return len(hMap.stepFrom(start, 0))
 }
 
-func (hMap HikingMap) stepFrom(loc Location, level int) int {
+func (hMap HikingMap) stepFrom(loc Location, level int) []Location {
 	if hMap.At(loc) == 9 {
-		return 1
+		return []Location{loc}
 	}
 
 	// Check for 1 increase in every direction
-	sum_9_heights := 0
-	if hMap.At(loc) == hMap.up(loc) - 1 {
-		sum_9_heights += hMap.stepFrom(loc.Up(), level + 1)
+	allTargets := make(map[Location]bool)
+	if hMap.At(loc) == hMap.up(loc)-1 {
+		targets := hMap.stepFrom(loc.Up(), level+1)
+		for _, target := range targets {
+			allTargets[target] = true
+		}
 	}
-	if hMap.At(loc) == hMap.down(loc) - 1 {
-		sum_9_heights += hMap.stepFrom(loc.Down(), level + 1)
+	if hMap.At(loc) == hMap.down(loc)-1 {
+		targets := hMap.stepFrom(loc.Down(), level+1)
+		for _, target := range targets {
+			allTargets[target] = true
+		}
 	}
-	if hMap.At(loc) == hMap.left(loc) - 1 {
-		sum_9_heights += hMap.stepFrom(loc.Left(), level + 1)
+	if hMap.At(loc) == hMap.left(loc)-1 {
+		targets := hMap.stepFrom(loc.Left(), level+1)
+		for _, target := range targets {
+			allTargets[target] = true
+		}
 	}
-	if hMap.At(loc) == hMap.right(loc) - 1 {
-		sum_9_heights += hMap.stepFrom(loc.Right(), level + 1)
+	if hMap.At(loc) == hMap.right(loc)-1 {
+		targets := hMap.stepFrom(loc.Right(), level+1)
+		for _, target := range targets {
+			allTargets[target] = true
+		}
 	}
-	fmt.Printf("Unwind Recursion Level: %d\n", level)
-	return sum_9_heights
-}
 
+	uniqueTargets := []Location{}
+	for target := range allTargets {
+		uniqueTargets = append(uniqueTargets, target)
+	}
+
+	fmt.Printf("Unwind Recursion Level: %d - %v\n", level, uniqueTargets)
+	return uniqueTargets
+}
 
 func (hMap HikingMap) TrailHeads() []Location {
 	trailHeads := []Location{}
@@ -121,19 +143,19 @@ type Location struct {
 }
 
 func (loc Location) Up() Location {
-	return Location{ loc.row - 1, loc.col }
+	return Location{loc.row - 1, loc.col}
 }
 
 func (loc Location) Down() Location {
-	return Location{ loc.row + 1, loc.col }
+	return Location{loc.row + 1, loc.col}
 }
 
 func (loc Location) Left() Location {
-	return Location{ loc.row, loc.col -1 }
+	return Location{loc.row, loc.col - 1}
 }
 
 func (loc Location) Right() Location {
-	return Location{ loc.row, loc.col + 1 }
+	return Location{loc.row, loc.col + 1}
 }
 
 func (loc Location) String() string {
