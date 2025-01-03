@@ -27,28 +27,32 @@ type HikingMap struct {
 }
 
 // Walk the trails and sum the number of peaks the reach
-func (hMap HikingMap) walk() int {
+func (hMap HikingMap) Walk(start Location) int {
 
-	return 42
+	return hMap.stepFrom(start, 0)
 }
 
-func (hMap HikingMap) stepFrom(loc Location) bool {
+func (hMap HikingMap) stepFrom(loc Location, level int) int {
 	if hMap.At(loc) == 9 {
-		return true
+		return 1
 	}
+
+	// Check for 1 increase in every direction
+	sum_9_heights := 0
 	if hMap.At(loc) == hMap.up(loc) - 1 {
-		hMap.stepFrom(loc.Up())
+		sum_9_heights += hMap.stepFrom(loc.Up(), level + 1)
 	}
 	if hMap.At(loc) == hMap.down(loc) - 1 {
-		hMap.stepFrom(loc.Down())
+		sum_9_heights += hMap.stepFrom(loc.Down(), level + 1)
 	}
 	if hMap.At(loc) == hMap.left(loc) - 1 {
-		hMap.stepFrom(loc.Left())
+		sum_9_heights += hMap.stepFrom(loc.Left(), level + 1)
 	}
 	if hMap.At(loc) == hMap.right(loc) - 1 {
-		hMap.stepFrom(loc.Right())
+		sum_9_heights += hMap.stepFrom(loc.Right(), level + 1)
 	}
-	return false
+	fmt.Printf("Unwind Recursion Level: %d\n", level)
+	return sum_9_heights
 }
 
 
@@ -130,4 +134,8 @@ func (loc Location) Left() Location {
 
 func (loc Location) Right() Location {
 	return Location{ loc.row, loc.col + 1 }
+}
+
+func (loc Location) String() string {
+	return fmt.Sprintf("(%d, %d)", loc.row, loc.col)
 }
