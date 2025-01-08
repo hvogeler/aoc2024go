@@ -14,14 +14,14 @@ func Test_Walk(t *testing.T) {
 		var genCound int
 		var stone string
 
-		stone = "17"
-		genCound = 6
-		sum := 0
+		stone = "125"
+		genCound = 50
+		sum := int64(1)
 		// if len(stone) % 2 == 0 {
 		// 	sum = 1
 		// }
-		Walk(stone, &sum, 1, genCound)
-		fmt.Printf("Number of stones for %s after %d generations: %d\n", stone, genCound, sum)
+		Walk(stone, &sum, 0, genCound)
+		fmt.Printf("Stone %s after %d generations. Number of stones: %d\n", stone, genCound, sum)
 	})
 
 }

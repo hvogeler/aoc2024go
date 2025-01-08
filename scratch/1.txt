@@ -41,17 +41,5 @@ Number of stones for 125 after 6 generations: 7
 6 Gen 15 stones [40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2]
 Number of stones for 17 after 6 generations: 15
 
-Walk Stone '17' on Level 1. Agg = 0
-Walk Stone '1' on Level 2. Agg = 1
-Walk Stone '20' on Level 4. Agg = 2
-Walk Stone '2' on Level 5. Agg = 3
-Walk Stone '0' on Level 5. Agg = 4
-Walk Stone '24' on Level 4. Agg = 5
-Walk Stone '2' on Level 5. Agg = 6
-Walk Stone '4' on Level 5. Agg = 7
-Walk Stone '7' on Level 2. Agg = 8
-Walk Stone '2867' on Level 5. Agg = 9
-Walk Stone '6032' on Level 5. Agg = 10
-Number of stones for 17 after 6 generations: 11
 
 
