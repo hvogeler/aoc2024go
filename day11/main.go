@@ -37,6 +37,7 @@ func main() {
 	var data string = string(raw)
 	firstGen := strings.Split(data, " ")
 
+    // firstGen := []string{"872027"} // took 9:20
 	start := time.Now()
 	var n int64
 	if *walk {
