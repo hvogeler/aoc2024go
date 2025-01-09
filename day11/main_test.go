@@ -15,7 +15,7 @@ func Test_Map(t *testing.T) {
 		stonesMap := dedup(&stones)
 		ngen := 25
 		sum := int64(1)
-		sum = DoNgenMap(stonesMap, ngen)
+		sum = stonesMap.DoNgenMap(ngen)
 		fmt.Printf("Stone %v after %d generations. Number of stones: %d\n", stones, ngen, sum)
 	})
 
@@ -23,13 +23,50 @@ func Test_Map(t *testing.T) {
 		input := strings.Split("8096 1 8096 16192 2 0 2 4 8096 1 8096 16192 16192 1 18216 12144", " ")
 		expected := strings.Split("80 96 2024 80 96 32772608 4048 1 4048 8096 80 96 2024 80 96 32772608 32772608 2024 36869184 24579456", " ")
 		expectedMap := dedup(&expected)
+		if expectedMap.CountStones() != 20 {
+			t.Errorf("CountSum should be 20, is %d", expectedMap.CountStones())
+		}
 
 		gen := dedup(&input)
-		nextGen := NextGenMap(&gen)
+		nextGen := (&gen).NextGenMap()
+		if nextGen.CountStones() != 20 {
+			t.Errorf("CountSum should be 20, is %d", nextGen.CountStones())
+		}
 		fmt.Println(nextGen)
 		if !reflect.DeepEqual(nextGen, expectedMap) {
 			t.Errorf("Result not as expected")
 		}
+
+		input = strings.Split("512 72 2024 2 0 2 4 2867 6032", " ")
+		expected = strings.Split("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32", " ")
+		expectedMap = dedup(&expected)
+
+		gen = dedup(&input)
+		nextGen = (&gen).NextGenMap()
+		fmt.Println(nextGen)
+		if !reflect.DeepEqual(nextGen, expectedMap) {
+			t.Errorf("Result not as expected")
+		}
+
+		if gen.CountStones() != 9 {
+			t.Errorf("CountSum should be 9, but is %d", gen.CountStones())
+		}
+
+		if nextGen.CountStones() != 13 {
+			t.Errorf("CountSum should be 13, but is %d", nextGen.CountStones())
+		}
+
+		input = strings.Split("512072 1 20 24 28676032", " ")
+		expected = strings.Split("512 72 2024 2 0 2 4 2867 6032", " ")
+		expectedMap = dedup(&expected)
+
+		gen = dedup(&input)
+		nextGen = (&gen).NextGenMap()
+		fmt.Println(nextGen)
+		if !reflect.DeepEqual(nextGen, expectedMap) {
+			t.Errorf("Result not as expected 2")
+		}
+
 	})
 
 	t.Run("applyRules", func(t *testing.T) {
@@ -40,7 +77,7 @@ func Test_Map(t *testing.T) {
 			t.Errorf("times 2024 Rule failed")
 		}
 		gen := applyRules("2234")
-		if reflect.DeepEqual(gen, []string{"22", "34"}) {
+		if !reflect.DeepEqual(gen, []string{"22", "34"}) {
 			t.Errorf("split Rule failed")
 		}
 	})
@@ -51,13 +88,14 @@ func Test_Walk(t *testing.T) {
 	t.Run("DoNGen", func(t *testing.T) {
 		// firstGen := []string{"125", "17"}
 
-		stones := []string{"4", "1", "5", "3"}
-		stones = []string{"41", "53"}
-		stones = []string{"125", "17"}
-		ngen := 10
+		stones := []string{"125", "17"}
+		ngen := 25
 		sum := int64(0)
 		sum = DoNgen(stones, ngen)
 		fmt.Printf("Stone %v after %d generations. Number of stones: %d\n", stones, ngen, sum)
+        if sum != 55312 {
+            t.Errorf("Expected 55312 stones, got %d", sum)
+        }
 	})
 
 	t.Run("Walk", func(t *testing.T) {

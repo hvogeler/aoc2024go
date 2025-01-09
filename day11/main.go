@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -14,21 +13,13 @@ import (
 )
 
 func main() {
-
-	// stone := "125"
-	// genCound := 50
-	// sum := 1
-
-	// slog.Info("Calculate %d generations for stone %s", genCound, stone)
-	// Walk(stone, &sum, 0, genCound)
-	// slog.Info(fmt.Sprintf("Stone %s after %d generations. Number of stones: %d\n", stone, genCound, sum))
+	// Part 1: ./day11 -ngen 25 : 199946
+    // Part 2: ./day11 -ngen 75 : 237994815702032
 
 	ngen := flag.Int("ngen", 25, "number of generations to calculate")
-	walk := flag.Bool("walk", true, "do recursive walk (true) or loop (false)")
 	pdata := flag.String("data", "", "Stones like '125 17 3'")
 	flag.Parse()
 
-	runtime.GOMAXPROCS(10)
 	var data string
 	if *pdata == "" {
 		bytes, err := os.ReadFile("testdata.dat")
@@ -42,28 +33,140 @@ func main() {
 	}
 	firstGen := strings.Split(data, " ")
 
-	// firstGen := []string{"872027"} // took 9:20
 	start := time.Now()
-	var n int64
-	if *walk {
-		n = WalkNgen(firstGen, *ngen)
-	} else {
-		n = DoNgen(firstGen, *ngen)
-	}
+
+	n := dedup(&firstGen).DoNgenMap(*ngen)
 	duration := time.Since(start)
 	slog.Info(fmt.Sprintf("Stones: %d  ---  run duration: %v", n, duration))
-	// // Part 1: 199946
-
-	// sum := 0
-	// for i, stone := range firstGen {
-	// 	fmt.Printf("Stone %s, %d of %d\n", stone, i+1, len(firstGen))
-	// 	n = DoNgen([]string{stone}, 75)
-	// 	fmt.Printf("Stone %s, %d of %d, Stones %d", stone, i+i, len(firstGen), n)
-	// 	sum += n
-	// }
-	// fmt.Println("Stones: ", sum)
-
 }
+
+type StoneMap map[string]int
+
+func (stones StoneMap) CountStones() int64 {
+	sum := int64(0)
+	for _, count := range stones {
+		sum += int64(count)
+	}
+	return sum
+}
+
+func dedup(stones *[]string) StoneMap {
+	m := make(map[string]int)
+	for _, stone := range *stones {
+		m[stone] = m[stone] + 1
+	}
+	return m
+}
+
+func (firstGen StoneMap) DoNgenMap(generations int) int64 {
+	currentGen := firstGen
+	for i := 0; i < generations; i++ {
+		nextGen := (&currentGen).NextGenMap()
+		fmt.Printf("Gen %d: %d stones, MapLen: %d ", i+1, nextGen.CountStones(), len(nextGen))
+		if len(nextGen) < 15 {
+			fmt.Printf(" %v\n", nextGen)
+		} else {
+			fmt.Println()
+		}
+		currentGen = nextGen
+	}
+
+	return int64(currentGen.CountStones())
+}
+
+func (currentGen *StoneMap) NextGenMap() StoneMap {
+	nextGen := make(StoneMap)
+	for inscription, count := range *currentGen {
+		newInscription := applyRules(inscription)
+		switch len(newInscription) {
+		case 1:
+			nextGen[newInscription[0]] += count
+		case 2:
+			nextGen[newInscription[0]] += count
+			nextGen[newInscription[1]] += count
+		default:
+			panic("Rule result must be len 2 or less")
+		}
+	}
+
+	return nextGen
+}
+
+func applyRules(inscription string) []string {
+	newInscription := []string{}
+	if inscription == "0" {
+		newInscription = []string{"1"}
+		return newInscription
+	}
+
+	if len(inscription)%2 == 0 {
+		runes := []rune(inscription)
+		leftHalf := runes[:len(inscription)/2]
+		rightHalf := runes[len(inscription)/2:]
+		newInscription = []string{ReduceZeros(string(leftHalf)), ReduceZeros(string(rightHalf))}
+		return newInscription
+	}
+
+	v, err := strconv.Atoi(inscription)
+	if err == nil {
+		v *= 2024
+		newInscription = []string{ReduceZeros(fmt.Sprintf("%d", v))}
+	}
+	return newInscription
+}
+
+func DoNgen(firstGen []string, n int) int64 {
+	currentGen := firstGen
+	for i := 0; i < n; i++ {
+		nextGen := NextGen(currentGen)
+		// fmt.Printf("%d Gen %d stones, stones %d", i+1, len(nextGen), len(nextGen))
+		fmt.Printf("Gen %d: %d stones  ", i+1, len(nextGen))
+		// fmt.Printf("%d\n", len(nextGen))
+		if len(nextGen) < 150 {
+			fmt.Printf(" %v\n", nextGen)
+		} else {
+			fmt.Println()
+		}
+		currentGen = nextGen
+	}
+
+	return int64(len(currentGen))
+}
+
+func NextGen(currentGen []string) []string {
+	nextGen := []string{}
+	for _, inscription := range currentGen {
+		if inscription == "0" {
+			nextGen = append(nextGen, "1")
+			continue
+		}
+
+		if len(inscription)%2 == 0 {
+			runes := []rune(inscription)
+			leftHalf := runes[:len(inscription)/2]
+			rightHalf := runes[len(inscription)/2:]
+			nextGen = append(nextGen, ReduceZeros(string(leftHalf)))
+			nextGen = append(nextGen, ReduceZeros(string(rightHalf)))
+			continue
+		}
+
+		v, err := strconv.Atoi(inscription)
+		if err == nil {
+			v *= 2024
+			nextGen = append(nextGen, ReduceZeros(fmt.Sprintf("%d", v)))
+		}
+	}
+	return nextGen
+}
+
+func ReduceZeros(s string) string {
+	v, err := strconv.Atoi(s)
+	if err == nil {
+		return fmt.Sprintf("%d", v)
+	}
+	return s
+}
+
 
 func WalkNgen(firstGen []string, genCound int) int64 {
 	total := int64(0)
@@ -73,7 +176,6 @@ func WalkNgen(firstGen []string, genCound int) int64 {
 		go func() {
 			defer waitGroup.Done()
 			sum := int64(1)
-			// slog.Info("\n\n-----------------------------------------------------------\n")
 			slog.Info(fmt.Sprintf("Calculate %d generations for stone %s", genCound, stone))
 			Walk(stone, &sum, 0, genCound)
 			slog.Info(fmt.Sprintf("Done. Stone %s after %d generations. Number of stones: %d\n", stone, genCound, sum))
@@ -117,133 +219,4 @@ func Walk(stone string, sumStones *int64, currentGen int, maxGen int) {
 		slog.Info("     -- EXIT 3 --", "Gen", gen, "Depth", paths)
 		return
 	}
-
-	// panic(fmt.Sprintf("Wrong numger of stones for Walk. Can only be 1 or 2, but got %d", len(stones)))
-}
-
-type StoneMap map[string]int
-
-func NextGenMap(currentGen *StoneMap) StoneMap {
-	nextGen := make(StoneMap)
-	for inscription, count := range *currentGen {
-		fmt.Println(inscription, count)
-		newInscription := applyRules(inscription)
-		switch len(newInscription) {
-		case 1:
-			nextGen[newInscription[0]] = count
-        case 2:
-			nextGen[newInscription[0]] = count
-			nextGen[newInscription[1]] = count
-        default:
-            panic("Rule result must be len 2 or less")
-		}
-	}
-
-	return nextGen
-}
-
-func applyRules(inscription string) []string {
-	newInscription := []string{}
-	if inscription == "0" {
-		newInscription = []string{"1"}
-		return newInscription
-	}
-
-	if len(inscription)%2 == 0 {
-		runes := []rune(inscription)
-		leftHalf := runes[:len(inscription)/2]
-		rightHalf := runes[len(inscription)/2:]
-		newInscription = []string{ReduceZeros(string(leftHalf)), ReduceZeros(string(rightHalf))}
-		return newInscription
-	}
-
-	v, err := strconv.Atoi(inscription)
-	if err == nil {
-		v *= 2024
-		newInscription = []string{ReduceZeros(fmt.Sprintf("%d", v))}
-	}
-	return newInscription
-}
-
-func NextGen(currentGen []string) []string {
-	nextGen := []string{}
-	for _, inscription := range currentGen {
-		if inscription == "0" {
-			nextGen = append(nextGen, "1")
-			continue
-		}
-
-		if len(inscription)%2 == 0 {
-			runes := []rune(inscription)
-			leftHalf := runes[:len(inscription)/2]
-			rightHalf := runes[len(inscription)/2:]
-			nextGen = append(nextGen, ReduceZeros(string(leftHalf)))
-			nextGen = append(nextGen, ReduceZeros(string(rightHalf)))
-			continue
-		}
-
-		v, err := strconv.Atoi(inscription)
-		if err == nil {
-			v *= 2024
-			nextGen = append(nextGen, ReduceZeros(fmt.Sprintf("%d", v)))
-		}
-	}
-	return nextGen
-}
-
-func ReduceZeros(s string) string {
-	v, err := strconv.Atoi(s)
-	if err == nil {
-		return fmt.Sprintf("%d", v)
-	}
-	return s
-}
-
-func DoNgenMap(firstGen StoneMap, n int) int64 {
-	currentGen := firstGen
-	for i := 0; i < n; i++ {
-		nextGen := NextGenMap(&currentGen)
-		// fmt.Printf("%d\n", len(nextGen))
-		if len(nextGen) < 150 {
-			fmt.Printf(" %v\n", nextGen)
-		} else {
-			fmt.Println()
-		}
-		currentGen = nextGen
-	}
-
-	return int64(CountStones(currentGen))
-}
-
-func CountStones(stones StoneMap) int64 {
-    sum := int64(0)
-    for _, count := range stones {
-        sum += int64(count)
-    }
-    return sum
-}
-
-func DoNgen(firstGen []string, n int) int64 {
-	currentGen := firstGen
-	for i := 0; i < n; i++ {
-		nextGen := NextGen(currentGen)
-		fmt.Printf("%d Gen %d stones, stones %d", i+1, len(nextGen), len(nextGen))
-		// fmt.Printf("%d\n", len(nextGen))
-		if len(nextGen) < 150 {
-			fmt.Printf(" %v\n", nextGen)
-		} else {
-			fmt.Println()
-		}
-		currentGen = nextGen
-	}
-
-	return int64(len(currentGen))
-}
-
-func dedup(stones *[]string) StoneMap {
-	m := make(map[string]int)
-	for _, stone := range *stones {
-		m[stone] = m[stone] + 1
-	}
-	return m
 }
