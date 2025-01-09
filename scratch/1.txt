@@ -1,45 +1,12 @@
-Walk Stone '125' on Level 1. Agg = 1374390633464
-Walk Stone '253' on Level 3. Agg = 1374390633464
-Walk Stone '512' on Level 5. Agg = 1374390633464
-Walk Stone '72' on Level 5. Agg = 1374390633464
-Walk Stone '0' on Level 3. Agg = 1374390633464
-Number of stones for 125 after 6 generations: 5
-
-Walk Stone '125' on Level 1. Agg = 1374390632952
-Walk Stone '253' on Level 3. Agg = 1374390632952
-Walk Stone '512' on Level 5. Agg = 1374390632952
-Walk Stone '72' on Level 5. Agg = 1374390632952
-Walk Stone '7' on Level 6. Agg = 1374390632952
-Walk Stone '2' on Level 6. Agg = 1374390632952
-Walk Stone '0' on Level 3. Agg = 1374390632952
-Walk Stone '20' on Level 6. Agg = 1374390632952
-Walk Stone '24' on Level 6. Agg = 1374390632952
-Number of stones for 125 after 6 generations: 9
-
-1 Gen 1 stones [253000]
-2 Gen 2 stones [253 0]
-3 Gen 2 stones [512072 1]
-4 Gen 3 stones [512 72 2024]
-5 Gen 5 stones [1036288 7 2 20 24]
-6 Gen 7 stones [2097446912 14168 4048 2 0 2 4]
-Number of stones for 125 after 6 generations: 7
-
-Walk Stone '125' on Level 1. Agg = 0
-Walk Stone '253' on Level 3. Agg = 1
-Walk Stone '512' on Level 5. Agg = 2
-Walk Stone '72' on Level 5. Agg = 3
-Walk Stone '0' on Level 3. Agg = 4
-Walk Stone '20' on Level 6. Agg = 5
-Walk Stone '24' on Level 6. Agg = 6
-Number of stones for 125 after 6 generations: 7
-
-1 Gen 2 stones [1 7]
-2 Gen 2 stones [2024 14168]
-3 Gen 3 stones [20 24 28676032]
-4 Gen 6 stones [2 0 2 4 2867 6032]
-5 Gen 8 stones [4048 1 4048 8096 28 67 60 32]
-6 Gen 15 stones [40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2]
-Number of stones for 17 after 6 generations: 15
-
-
+1 Gen 3 stones, stones 3 [253000 1 7]
+2 Gen 4 stones, stones 4 [253 0 2024 14168]
+3 Gen 5 stones, stones 5 [512072 1 20 24 28676032]
+4 Gen 9 stones, stones 9 [512 72 2024 2 0 2 4 2867 6032]
+5 Gen 13 stones, stones 13 [1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32]
+6 Gen 22 stones, stones 22 [2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2]
+7 Gen 31 stones, stones 31 [20974 46912 28676032 40 48 4048 1 4048 8096 4 0 4 8 20 24 4 0 4 8 8 0 9 6 4048 16192 12144 14168 12144 1 6072 4048]
+8 Gen 42 stones, stones 42 [42451376 94949888 2867 6032 4 0 4 8 40 48 2024 40 48 80 96 8096 1 8096 16192 2 0 2 4 8096 1 8096 16192 16192 1 18216 12144 40 48 32772608 24579456 28676032 24579456 2024 60 72 40 48]
+9 Gen 68 stones, stones 68 [4245 1376 9494 9888 28 67 60 32 8096 1 8096 16192 4 0 4 8 20 24 4 0 4 8 8 0 9 6 80 96 2024 80 96 32772608 4048 1 4048 8096 80 96 2024 80 96 32772608 32772608 2024 36869184 24579456 4 0 4 8 3277 2608 2457 9456 2867 6032 2457 9456 20 24 6 0 7 2 4 0 4 8]
+10 Gen 109 stones, stones 109 [42 45 13 76 94 94 98 88 2 8 6 7 6 0 3 2 80 96 2024 80 96 32772608 8096 1 8096 16192 2 0 2 4 8096 1 8096 16192 16192 1 18216 12144 8 0 9 6 20 24 8 0 9 6 3277 2608 40 48 2024 40 48 80 96 8 0 9 6 20 24 8 0 9 6 3277 2608 3277 2608 20 24 3686 9184 2457 9456 8096 1 8096 16192 32 77 26 8 24 57 94 56 28 67 60 32 24 57 94 56 2 0 2 4 12144 1 14168 4048 8096 1 8096 16192]
+Stone [125 17] after 10 generations. Number of stones: 109
 

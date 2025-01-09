@@ -2,11 +2,63 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 )
 
+func Test_Map(t *testing.T) {
+	t.Run("DoNGenMap", func(t *testing.T) {
+		// firstGen := []string{"125", "17"}
+
+		stones := []string{"125", "17"}
+		stonesMap := dedup(&stones)
+		ngen := 25
+		sum := int64(1)
+		sum = DoNgenMap(stonesMap, ngen)
+		fmt.Printf("Stone %v after %d generations. Number of stones: %d\n", stones, ngen, sum)
+	})
+
+	t.Run("NextGenMap", func(t *testing.T) {
+		input := strings.Split("8096 1 8096 16192 2 0 2 4 8096 1 8096 16192 16192 1 18216 12144", " ")
+		expected := strings.Split("80 96 2024 80 96 32772608 4048 1 4048 8096 80 96 2024 80 96 32772608 32772608 2024 36869184 24579456", " ")
+		expectedMap := dedup(&expected)
+
+		gen := dedup(&input)
+		nextGen := NextGenMap(&gen)
+		fmt.Println(nextGen)
+		if !reflect.DeepEqual(nextGen, expectedMap) {
+			t.Errorf("Result not as expected")
+		}
+	})
+
+	t.Run("applyRules", func(t *testing.T) {
+		if applyRules("0")[0] != "1" {
+			t.Errorf("0 Rule failed")
+		}
+		if applyRules("2")[0] != "4048" {
+			t.Errorf("times 2024 Rule failed")
+		}
+		gen := applyRules("2234")
+		if reflect.DeepEqual(gen, []string{"22", "34"}) {
+			t.Errorf("split Rule failed")
+		}
+	})
+
+}
+
 func Test_Walk(t *testing.T) {
+	t.Run("DoNGen", func(t *testing.T) {
+		// firstGen := []string{"125", "17"}
+
+		stones := []string{"4", "1", "5", "3"}
+		stones = []string{"41", "53"}
+		stones = []string{"125", "17"}
+		ngen := 10
+		sum := int64(0)
+		sum = DoNgen(stones, ngen)
+		fmt.Printf("Stone %v after %d generations. Number of stones: %d\n", stones, ngen, sum)
+	})
 
 	t.Run("Walk", func(t *testing.T) {
 		// firstGen := []string{"125", "17"}
@@ -14,12 +66,9 @@ func Test_Walk(t *testing.T) {
 		var genCound int
 		var stone string
 
-		stone = "125"
-		genCound = 50
+		stone = "1"
+		genCound = 25
 		sum := int64(1)
-		// if len(stone) % 2 == 0 {
-		// 	sum = 1
-		// }
 		Walk(stone, &sum, 0, genCound)
 		fmt.Printf("Stone %s after %d generations. Number of stones: %d\n", stone, genCound, sum)
 	})
