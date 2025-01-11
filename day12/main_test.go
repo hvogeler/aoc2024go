@@ -27,8 +27,8 @@ MIIIIIJJEE
 MIIISIJEEE
 MMMISSJEEE`
 
-func Test_Map(t *testing.T) {
-	t.Run("DoNGenMap", func(t *testing.T) {
+func Test_t1(t *testing.T) {
+	t.Run("t1", func(t *testing.T) {
 		fmt.Printf("TEST")
 	})
 
