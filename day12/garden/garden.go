@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-
-
 type Garden struct {
 	area [][]Plot
 	regionsMap map[PlantType][]Plot
@@ -18,13 +16,15 @@ func (garden Garden) String() string {
 	var s string
 	for _, row := range garden.area {
 		for _, plot := range row {
-			s = s + fmt.Sprintf("%s", plot.plantType)
+			s = s + plot.plantType.String()
 		}
 		s = s + fmt.Sprintln()
 	}
 	return s
 }
 
+// Creates the garden from the input string
+// TODO: populate regions and Plot.fences
 func GardenFromStr(data string) Garden {
 	garden := new(Garden)
 	scanner := bufio.NewScanner(strings.NewReader(data))

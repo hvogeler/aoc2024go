@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"day12/garden"
 )
 
 func main() {
@@ -11,5 +12,8 @@ func main() {
 		panic(err)
 	}
 	data := string(bytes)
-	fmt.Println(data)
+	// fmt.Println(data)
+
+	garden := garden.GardenFromStr(data)
+	fmt.Println(garden)
 }
