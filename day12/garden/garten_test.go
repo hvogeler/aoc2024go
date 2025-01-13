@@ -2,6 +2,7 @@ package garden
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -17,17 +18,39 @@ MIIISIJEEE
 MMMISSJEEE`
 
 func Test_FromStr(t *testing.T) {
+	t.Run("findRegions", func(t *testing.T) {
+		garden := GardenFromStr(example3)
+        garden.findRegions()
+        if len(garden.regionsMap) != 11 {
+            t.Errorf("Expected 11 regions, got %d", len(garden.regionsMap))
+        }
+    
+    })
+
 	t.Run("WalkPlots", func(t *testing.T) {
 		garden := GardenFromStr(example3)
-		region := new(Region)
-		garden.area[0][0].WalkPlot(region)
-		if len(*region) != 12 {
-			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region))
+		region1 := new(Region)
+		garden.area[0][0].WalkPlot(region1)
+		if len(*region1) != 12 {
+			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region1))
 		}
-		garden.area[2][3].WalkPlot(region)
-		if len(*region) != 12 {
-			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region))
+
+		region2 := new(Region)
+        garden.area[2][3].WalkPlot(region2)
+		if len(*region2) != 12 {
+			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region2))
 		}
+        region1.Sort()
+        region2.Sort()
+        if !reflect.DeepEqual(region1, region2) {
+            t.Errorf("Regions should be equal")
+        }
+
+        fmt.Println(region1.String())
+
+        region3 := new(Region) 
+        garden.area[1][6].WalkPlot(region3)
+        fmt.Println(region3.String())
 		// garden.area[0][0].WalkPlot(region)
 		// if len(*region) != 12 {
 		// 	t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region))

@@ -3,12 +3,14 @@ package garden
 import (
 	"bufio"
 	"fmt"
+	"math"
+	"slices"
 	"strings"
 )
 
 type Garden struct {
 	area       [][]Plot
-	regionsMap map[PlantType][]Plot
+	regionsMap map[PlantType]Region
 	dimensions Dimensions
 }
 
@@ -42,7 +44,7 @@ func GardenFromStr(data string) Garden {
 		garden.area = append(garden.area, row)
 		rowno++
 	}
-	garden.regionsMap = make(map[PlantType][]Plot)
+	garden.regionsMap = make(map[PlantType]Region)
 	garden.dimensions = Dimensions{rowno, len(garden.area[0])}
 	garden.checkNeighbors()
 	return *garden
@@ -75,16 +77,18 @@ func (garden *Garden) checkNeighbors() {
 	}
 }
 
-// func (garden *Garden) findRegions() {
-// 	for row := 0; row < garden.dimensions.rows; row++ {
-// 		for col := 0; col < garden.dimensions.cols; col++ {
-// 			plot := garden.area[row][col]
-// 			if _, regionExists := garden.regionsMap[plot.plantType]; !regionExists {
-// 				garden.exploreRegion(plot)
-// 			}
-// 		}
-// 	}
-// }
+func (garden *Garden) findRegions() {
+	for row := 0; row < garden.dimensions.rows; row++ {
+		for col := 0; col < garden.dimensions.cols; col++ {
+			plot := garden.area[row][col]
+			if _, regionExists := garden.regionsMap[plot.plantType]; !regionExists {
+                region := new(Region)
+				plot.WalkPlot(region)
+                garden.regionsMap[plot.plantType] = *region
+			}
+		}
+	}
+}
 
 // func (garden Garden) exploreRegion(plot Plot) {
 
@@ -101,13 +105,49 @@ func (region Region) contains(plot *Plot) bool {
 	return false
 }
 
-func (plot Plot) WalkPlot(region *Region) {
-	*region = append(*region, plot)
-	for direction := above; direction <= left; direction++ {
-		if plot.neighbors[direction] != nil && !region.contains(plot.neighbors[direction]) {
-			plot.neighbors[direction].WalkPlot(region)
+func (region Region) containsLocation(loc Location) bool {
+	for _, existingPlot := range region {
+		if existingPlot.location == loc {
+			return true
 		}
 	}
+	return false
+}
+
+func (region *Region) Sort() {
+	slices.SortFunc([]Plot(*region), func(a, b Plot) int {
+		return a.location.Compare(b.location)
+	})
+}
+
+func (region Region) String() string {
+	result := ""
+	tmp := region
+	tmp.Sort()
+	minRow := tmp[0].location.row
+	maxRow := tmp[len(tmp)-1].location.row
+	minCol := math.MaxInt
+	maxCol := 0
+	for _, plot := range tmp {
+		if plot.location.col < minCol {
+			minCol = plot.location.col
+		}
+		if plot.location.col > maxCol {
+			maxCol = plot.location.col
+		}
+	}
+
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			if region.containsLocation((Location{row, col})) {
+				result += region[0].plantType.String()
+			} else {
+				result += "."
+			}
+		}
+		result += "\n"
+	}
+	return result
 }
 
 const (
@@ -128,6 +168,15 @@ func (a Plot) Equals(b Plot) bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+func (plot Plot) WalkPlot(region *Region) {
+	*region = append(*region, plot)
+	for direction := above; direction <= left; direction++ {
+		if plot.neighbors[direction] != nil && !region.contains(plot.neighbors[direction]) {
+			plot.neighbors[direction].WalkPlot(region)
+		}
 	}
 }
 
@@ -156,6 +205,25 @@ type Location struct {
 
 func (loc Location) String() string {
 	return fmt.Sprintf("(%d, %d)", loc.row, loc.col)
+}
+
+func (loca Location) Compare(locb Location) int {
+	if loca == locb {
+		return 0
+	}
+	if loca.row < locb.row {
+		return -1
+	}
+	if loca.row > locb.row {
+		return 1
+	}
+	if loca.col < locb.col {
+		return -1
+	}
+	if loca.col > locb.col {
+		return 1
+	}
+	panic("Cannot happen")
 }
 
 type Dimensions struct {
