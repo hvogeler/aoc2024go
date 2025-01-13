@@ -15,5 +15,7 @@ func main() {
 	// fmt.Println(data)
 
 	garden := garden.GardenFromStr(data)
-	fmt.Println(garden)
+	
+	fenceCost := garden.FenceCost()
+	fmt.Printf("Garden Fencecost = %d\n", fenceCost)
 }

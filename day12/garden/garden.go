@@ -10,8 +10,16 @@ import (
 
 type Garden struct {
 	area       [][]Plot
-	regionsMap map[PlantType]Region
+	regions    []Region
 	dimensions Dimensions
+}
+
+func (garden Garden) FenceCost() int {
+    fenceCost := 0
+    for _, region := range garden.regions {
+        fenceCost += region.FenceCost()
+    }
+    return fenceCost
 }
 
 func (garden Garden) String() string {
@@ -44,9 +52,10 @@ func GardenFromStr(data string) Garden {
 		garden.area = append(garden.area, row)
 		rowno++
 	}
-	garden.regionsMap = make(map[PlantType]Region)
+	
 	garden.dimensions = Dimensions{rowno, len(garden.area[0])}
 	garden.checkNeighbors()
+    garden.findRegions()
 	return *garden
 }
 
@@ -80,11 +89,11 @@ func (garden *Garden) checkNeighbors() {
 func (garden *Garden) findRegions() {
 	for row := 0; row < garden.dimensions.rows; row++ {
 		for col := 0; col < garden.dimensions.cols; col++ {
-			plot := garden.area[row][col]
-			if _, regionExists := garden.regionsMap[plot.plantType]; !regionExists {
+			plot := &garden.area[row][col]
+			if !plot.isAssignedToRegion {
                 region := new(Region)
 				plot.WalkPlot(region)
-                garden.regionsMap[plot.plantType] = *region
+                garden.regions = append(garden.regions, *region)
 			}
 		}
 	}
@@ -95,6 +104,26 @@ func (garden *Garden) findRegions() {
 // }
 
 type Region []Plot
+
+func (region Region) PlantType() PlantType {
+	return region[0].plantType
+}
+
+func (region Region) FenceCost() int {
+    return len(region) * region.Perimeter()
+}
+
+func (region Region) Perimeter() int {
+    perimeter := 0
+    for _, plot := range region {
+        for _, neighbor := range plot.neighbors {
+            if neighbor == nil {
+                perimeter++
+            }
+        }
+    }
+    return perimeter
+}
 
 func (region Region) contains(plot *Plot) bool {
 	for _, existingPlot := range region {
@@ -161,6 +190,11 @@ type Plot struct {
 	plantType PlantType
 	location  Location
 	neighbors [4]*Plot
+    isAssignedToRegion bool
+}
+
+func (plot *Plot) assignToRegion() {
+    plot.isAssignedToRegion = true
 }
 
 func (a Plot) Equals(b Plot) bool {
@@ -171,8 +205,9 @@ func (a Plot) Equals(b Plot) bool {
 	}
 }
 
-func (plot Plot) WalkPlot(region *Region) {
-	*region = append(*region, plot)
+func (plot *Plot) WalkPlot(region *Region) {
+    plot.assignToRegion()
+	*region = append(*region, *plot)
 	for direction := above; direction <= left; direction++ {
 		if plot.neighbors[direction] != nil && !region.contains(plot.neighbors[direction]) {
 			plot.neighbors[direction].WalkPlot(region)
@@ -186,17 +221,6 @@ func (plantType PlantType) String() string {
 	return string(plantType)
 }
 
-// type Fence struct {
-// 	fenceType FenceType
-// }
-
-// type FenceType int
-// const (
-// 	top FenceType = iota
-// 	bottom
-// 	left
-// 	right
-// )
 
 type Location struct {
 	row int

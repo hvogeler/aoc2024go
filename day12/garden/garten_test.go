@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-const example3 = `RRRRIICCFF
+const example1 = `RRRRIICCFF
 RRRRIICCCF
 VVRRRCCFFF
 VVRCCCJFFF
@@ -17,18 +17,79 @@ MIIIIIJJEE
 MIIISIJEEE
 MMMISSJEEE`
 
+const example2 =`OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO`
+
+
+func Test_FenceCost(t *testing.T) {
+	t.Run("FenceCost1", func(t *testing.T) {
+		garden := GardenFromStr(example1)
+        garden.findRegions()
+        fenceCost := garden.regions[0].FenceCost()
+        if fenceCost != 216 {
+            t.Errorf("Expected fencecost 216, got %d", fenceCost)
+        }
+    })
+
+    t.Run("FenceCostO", func(t *testing.T) {
+		garden := GardenFromStr(example2)
+        garden.findRegions()
+        fenceCost := garden.regions[0].FenceCost()
+        if fenceCost != 756 {
+            t.Errorf("Expected fencecost 756, got %d", fenceCost)
+        }
+    })
+
+    t.Run("FenceCostGarden1", func(t *testing.T) {
+		garden := GardenFromStr(example1)
+        garden.findRegions()
+        fenceCost := garden.FenceCost()
+        if fenceCost != 1930 {
+            t.Errorf("Expected fencecost 1930, got %d", fenceCost)
+        }
+    })
+
+    t.Run("FenceCostGarden2", func(t *testing.T) {
+		garden := GardenFromStr(example2)
+        garden.findRegions()
+        fenceCost := garden.FenceCost()
+        if fenceCost != 772 {
+            t.Errorf("Expected fencecost 772, got %d", fenceCost)
+        }
+    })
+}
+
+func Test_OOO(t *testing.T) {
+	t.Run("findRegions", func(t *testing.T) {
+		garden := GardenFromStr(example2)
+        garden.findRegions()
+        if len(garden.regions) != 5 {
+            t.Errorf("Expected 5 regions, got %d", len(garden.regions))
+        }
+        for _, region := range garden.regions {
+            fmt.Println(region)
+        }
+    })
+}
+
 func Test_FromStr(t *testing.T) {
 	t.Run("findRegions", func(t *testing.T) {
-		garden := GardenFromStr(example3)
+		garden := GardenFromStr(example1)
         garden.findRegions()
-        if len(garden.regionsMap) != 11 {
-            t.Errorf("Expected 11 regions, got %d", len(garden.regionsMap))
+        if len(garden.regions) != 11 {
+            t.Errorf("Expected 11 regions, got %d", len(garden.regions))
+        }
+        for _, region := range garden.regions {
+            fmt.Println(region)
         }
     
     })
 
 	t.Run("WalkPlots", func(t *testing.T) {
-		garden := GardenFromStr(example3)
+		garden := GardenFromStr(example1)
 		region1 := new(Region)
 		garden.area[0][0].WalkPlot(region1)
 		if len(*region1) != 12 {
@@ -58,7 +119,7 @@ func Test_FromStr(t *testing.T) {
 	})
 
 	t.Run("FromStr", func(t *testing.T) {
-		garden := GardenFromStr(example3)
+		garden := GardenFromStr(example1)
 		if garden.dimensions.rows != 10 {
 			t.Errorf("Expected 10 rows, got %d", garden.dimensions.rows)
 		}
