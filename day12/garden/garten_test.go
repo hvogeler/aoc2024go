@@ -112,10 +112,6 @@ func Test_FromStr(t *testing.T) {
         region3 := new(Region) 
         garden.area[1][6].WalkPlot(region3)
         fmt.Println(region3.String())
-		// garden.area[0][0].WalkPlot(region)
-		// if len(*region) != 12 {
-		// 	t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region))
-		// }
 	})
 
 	t.Run("FromStr", func(t *testing.T) {

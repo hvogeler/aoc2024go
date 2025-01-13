@@ -99,10 +99,6 @@ func (garden *Garden) findRegions() {
 	}
 }
 
-// func (garden Garden) exploreRegion(plot Plot) {
-
-// }
-
 type Region []Plot
 
 func (region Region) PlantType() PlantType {
