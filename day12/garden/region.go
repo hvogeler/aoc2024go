@@ -14,6 +14,10 @@ func (region Region) FenceCost() int {
 	return region.Length() * region.Perimeter()
 }
 
+func (region Region) FenceCost2() int {
+	return region.Length() * region.Sides()
+}
+
 func (region Region) Perimeter() int {
 	perimeter := 0
 	for _, plot := range region.plots {
@@ -31,6 +35,10 @@ func (region *Region) setCorners() {
 		corners := plot.Corners()
 		region.corners = append(region.corners, corners...)
 	}
+}
+
+func (region Region) Sides() int {
+	return len(region.corners)
 }
 
 func (region Region) Length() int {

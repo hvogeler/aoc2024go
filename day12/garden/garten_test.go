@@ -74,9 +74,16 @@ func Test_corners(t *testing.T) {
 }
 
 func Test_FenceCost2(t *testing.T) {
-	t.Run("FenceCost1", func(t *testing.T) {
+    t.Run("Corners", func(t *testing.T) {
 		garden := GardenFromStr(example1)
-		garden.findRegions()
+        fenceCost := garden.FenceCost2()
+        if fenceCost != 1206 {
+            t.Errorf("Expected fence cost 2 of 1206, got %d", fenceCost)
+        }
+    })
+
+	t.Run("Corners", func(t *testing.T) {
+		garden := GardenFromStr(example1)
         fmt.Println(garden.regions[0])
 		if len(garden.regions[0].corners) != 10 {
 			t.Errorf("Expected 10 corners, got %d", len(garden.regions[0].corners))
@@ -115,7 +122,6 @@ func Test_FenceCost2(t *testing.T) {
 func Test_FenceCost(t *testing.T) {
 	t.Run("FenceCost1", func(t *testing.T) {
 		garden := GardenFromStr(example1)
-		garden.findRegions()
 		fenceCost := garden.regions[0].FenceCost()
 		if fenceCost != 216 {
 			t.Errorf("Expected fencecost 216, got %d", fenceCost)
@@ -124,7 +130,6 @@ func Test_FenceCost(t *testing.T) {
 
 	t.Run("FenceCostO", func(t *testing.T) {
 		garden := GardenFromStr(example2)
-		garden.findRegions()
 		fenceCost := garden.regions[0].FenceCost()
 		if fenceCost != 756 {
 			t.Errorf("Expected fencecost 756, got %d", fenceCost)
@@ -133,7 +138,6 @@ func Test_FenceCost(t *testing.T) {
 
 	t.Run("FenceCostGarden1", func(t *testing.T) {
 		garden := GardenFromStr(example1)
-		garden.findRegions()
 		fenceCost := garden.FenceCost()
 		if fenceCost != 1930 {
 			t.Errorf("Expected fencecost 1930, got %d", fenceCost)
@@ -142,7 +146,6 @@ func Test_FenceCost(t *testing.T) {
 
 	t.Run("FenceCostGarden2", func(t *testing.T) {
 		garden := GardenFromStr(example2)
-		garden.findRegions()
 		fenceCost := garden.FenceCost()
 		if fenceCost != 772 {
 			t.Errorf("Expected fencecost 772, got %d", fenceCost)
@@ -153,7 +156,6 @@ func Test_FenceCost(t *testing.T) {
 func Test_OOO(t *testing.T) {
 	t.Run("findRegions", func(t *testing.T) {
 		garden := GardenFromStr(example2)
-		garden.findRegions()
 		if len(garden.regions) != 5 {
 			t.Errorf("Expected 5 regions, got %d", len(garden.regions))
 		}
@@ -166,7 +168,6 @@ func Test_OOO(t *testing.T) {
 func Test_FromStr(t *testing.T) {
 	t.Run("findRegions", func(t *testing.T) {
 		garden := GardenFromStr(example1)
-		garden.findRegions()
 		if len(garden.regions) != 11 {
 			t.Errorf("Expected 11 regions, got %d", len(garden.regions))
 		}

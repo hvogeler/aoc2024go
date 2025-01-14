@@ -20,6 +20,14 @@ func (garden Garden) FenceCost() int {
     return fenceCost
 }
 
+func (garden Garden) FenceCost2() int {
+    fenceCost := 0
+    for _, region := range garden.regions {
+        fenceCost += region.FenceCost2()
+    }
+    return fenceCost
+}
+
 func (garden Garden) String() string {
 	var s string
 	for _, row := range garden.area {

@@ -17,6 +17,10 @@ func main() {
 	garden := garden.GardenFromStr(data)
 	
 	fenceCost := garden.FenceCost()
-	fmt.Printf("Garden Fencecost = %d\n", fenceCost)
+	fmt.Printf("Garden Fencecost 1 = %d\n", fenceCost)
     // fence cost of Part 1 is 1396298
+
+    fenceCost2 := garden.FenceCost2()
+    fmt.Printf("Garden Fencecost 2 = %d\n", fenceCost2)
+    // fence cost of Part 2 is 853588
 }
