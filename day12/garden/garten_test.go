@@ -169,14 +169,14 @@ func Test_FromStr(t *testing.T) {
 		garden := GardenFromStr(example1)
 		region1 := new(Region)
 		garden.area[0][0].WalkPlot(region1)
-		if len(*region1) != 12 {
-			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region1))
+		if len(region1.plots) != 12 {
+			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(region1.plots))
 		}
 
 		region2 := new(Region)
         garden.area[2][3].WalkPlot(region2)
-		if len(*region2) != 12 {
-			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(*region2))
+		if len(region2.plots) != 12 {
+			t.Errorf("Expected region 'R' to contain 12 plots, but got %d", len(region2.plots))
 		}
         region1.Sort()
         region2.Sort()

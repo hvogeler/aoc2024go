@@ -110,12 +110,6 @@ func (plot Plot) CornerType() CornerType {
 
 }
 
-func absInt(n int) int {
-	if n < 0 {
-		return -n
-	}
-	return n
-}
 
 func (plot Plot) countNeighbors() int {
 	sum := 0
@@ -137,7 +131,7 @@ func (a Plot) Equals(b Plot) bool {
 
 func (plot *Plot) WalkPlot(region *Region) {
 	plot.assignToRegion()
-	*region = append(*region, *plot)
+	region.plots = append(region.plots, *plot)
 	for direction := above; direction <= left; direction++ {
 		if plot.neighbors[direction] != nil && !region.containsPlot(plot.neighbors[direction]) {
 			plot.neighbors[direction].WalkPlot(region)

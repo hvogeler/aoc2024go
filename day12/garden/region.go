@@ -5,7 +5,10 @@ import (
 	"slices"
 )
 
-type Region []Plot
+type Region struct {
+	plots []Plot
+	// corners []Corner
+}
 
 func (region Region) FenceCost() int {
 	return region.Length() * region.Perimeter()
@@ -13,7 +16,7 @@ func (region Region) FenceCost() int {
 
 func (region Region) Perimeter() int {
 	perimeter := 0
-	for _, plot := range region {
+	for _, plot := range region.plots {
 		for _, neighbor := range plot.neighbors {
 			if neighbor == nil {
 				perimeter++
@@ -28,15 +31,15 @@ func (region Region) Sides() int {
 }
 
 func (region Region) Length() int {
-	return len(region)
+	return len(region.plots)
 }
 
 func (region Region) PlantType() PlantType {
-	return region[0].plantType
+	return region.plots[0].plantType
 }
 
 func (region Region) containsPlot(plot *Plot) bool {
-	for _, existingPlot := range region {
+	for _, existingPlot := range region.plots {
 		if existingPlot.Equals(*plot) {
 			return true
 		}
@@ -45,7 +48,7 @@ func (region Region) containsPlot(plot *Plot) bool {
 }
 
 func (region Region) containsLocation(loc Location) bool {
-	for _, existingPlot := range region {
+	for _, existingPlot := range region.plots {
 		if existingPlot.location == loc {
 			return true
 		}
@@ -54,18 +57,18 @@ func (region Region) containsLocation(loc Location) bool {
 }
 
 func (region *Region) Sort() {
-	slices.SortFunc([]Plot(*region), func(a, b Plot) int {
+	slices.SortFunc(region.plots, func(a, b Plot) int {
 		return a.location.Compare(b.location)
 	})
 }
 
 func (region Region) String() string {
 	result := ""
-	minRow := region[0].location.row
-	maxRow := region[region.Length()-1].location.row
+	minRow := region.plots[0].location.row
+	maxRow := region.plots[region.Length()-1].location.row
 	minCol := math.MaxInt
 	maxCol := 0
-	for _, plot := range region {
+	for _, plot := range region.plots {
 		if plot.location.col < minCol {
 			minCol = plot.location.col
 		}
@@ -77,7 +80,7 @@ func (region Region) String() string {
 	for row := minRow; row <= maxRow; row++ {
 		for col := minCol; col <= maxCol; col++ {
 			if region.containsLocation((Location{row, col})) {
-				result += region[0].plantType.String()
+				result += region.plots[0].plantType.String()
 			} else {
 				result += "."
 			}
