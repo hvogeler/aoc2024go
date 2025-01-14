@@ -23,6 +23,10 @@ func (region Region) Perimeter() int {
 	return perimeter
 }
 
+func (region Region) Sides() int {
+	return 42
+}
+
 func (region Region) Length() int {
 	return len(region)
 }

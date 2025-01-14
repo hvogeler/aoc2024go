@@ -23,6 +23,83 @@ OOOOO
 OXOXO
 OOOOO`
 
+func Test_neighborrelation(t *testing.T) {
+	t.Run("neighbor 1 neighbor", func(t *testing.T) {
+        var nbabove Plot
+        var plot Plot
+
+        plot.neighbors[above] = &nbabove
+        if plot.CornerType() != deadEnd {
+            t.Errorf("Expected deadEnd")
+        }
+    })
+	t.Run("neighbor 4 neighbor", func(t *testing.T) {
+        var nbabove Plot
+        var plot Plot
+
+        plot.neighbors[above] = &nbabove
+        plot.neighbors[below] = &nbabove
+        plot.neighbors[right] = &nbabove
+        plot.neighbors[left] = &nbabove
+        if plot.CornerType() != noCorner {
+            t.Errorf("Expected noCorner")
+        }
+    })
+
+    t.Run("neighbor 2 relation", func(t *testing.T) {
+        var nbabove Plot
+        var nbbelow Plot
+        var nbright Plot
+        var nbleft Plot
+        var plot Plot
+
+        plot.neighbors[above] = &nbabove
+        plot.neighbors[below] = &nbbelow
+        if plot.CornerType() != noCorner {
+            t.Errorf("Expected noCorner")
+        }
+
+        plot.neighbors = [4]*Plot{}
+        plot.neighbors[right] = &nbright
+        plot.neighbors[left] = &nbleft
+        if plot.CornerType() != noCorner {
+            t.Errorf("Expected noCorner")
+        }
+
+        
+        plot.neighbors = [4]*Plot{}
+        plot.neighbors[above] = new(Plot)
+        plot.neighbors[above].neighbors[right] = nil
+        plot.neighbors[right] = &nbright
+        if plot.CornerType() != concave {
+            t.Errorf("Expected concave")
+        }
+                
+        plot.neighbors = [4]*Plot{}
+        plot.neighbors[above] = new(Plot)
+        plot.neighbors[above].neighbors[right] = &nbright
+        plot.neighbors[right] = &nbright
+        if plot.CornerType() != convex {
+            t.Errorf("Expected convex")
+        }
+                        
+        plot.neighbors = [4]*Plot{}
+        plot.neighbors[below] = new(Plot)
+        plot.neighbors[below].neighbors[left] = &nbright
+        plot.neighbors[left] = &nbright
+        if plot.CornerType() != convex {
+            t.Errorf("Expected convex")
+        }
+                                
+        plot.neighbors = [4]*Plot{}
+        plot.neighbors[below] = new(Plot)
+        plot.neighbors[below].neighbors[left] = nil
+        plot.neighbors[left] = &nbright
+        if plot.CornerType() != concave {
+            t.Errorf("Expected concave")
+        }
+    })
+}
 
 func Test_FenceCost(t *testing.T) {
 	t.Run("FenceCost1", func(t *testing.T) {
