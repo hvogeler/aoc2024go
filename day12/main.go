@@ -18,4 +18,5 @@ func main() {
 	
 	fenceCost := garden.FenceCost()
 	fmt.Printf("Garden Fencecost = %d\n", fenceCost)
+    // fence cost of Part 1 is 1396298
 }

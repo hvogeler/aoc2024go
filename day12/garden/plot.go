@@ -8,14 +8,14 @@ const (
 )
 
 type Plot struct {
-	plantType PlantType
-	location  Location
-	neighbors [4]*Plot
-    isAssignedToRegion bool
+	plantType          PlantType
+	location           Location
+	neighbors          [4]*Plot
+	isAssignedToRegion bool
 }
 
 func (plot *Plot) assignToRegion() {
-    plot.isAssignedToRegion = true
+	plot.isAssignedToRegion = true
 }
 
 func (a Plot) Equals(b Plot) bool {
@@ -27,10 +27,10 @@ func (a Plot) Equals(b Plot) bool {
 }
 
 func (plot *Plot) WalkPlot(region *Region) {
-    plot.assignToRegion()
+	plot.assignToRegion()
 	*region = append(*region, *plot)
 	for direction := above; direction <= left; direction++ {
-		if plot.neighbors[direction] != nil && !region.contains(plot.neighbors[direction]) {
+		if plot.neighbors[direction] != nil && !region.containsPlot(plot.neighbors[direction]) {
 			plot.neighbors[direction].WalkPlot(region)
 		}
 	}

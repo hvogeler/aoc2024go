@@ -5,30 +5,33 @@ import (
 	"slices"
 )
 
-
 type Region []Plot
+
+func (region Region) FenceCost() int {
+	return region.Length() * region.Perimeter()
+}
+
+func (region Region) Perimeter() int {
+	perimeter := 0
+	for _, plot := range region {
+		for _, neighbor := range plot.neighbors {
+			if neighbor == nil {
+				perimeter++
+			}
+		}
+	}
+	return perimeter
+}
+
+func (region Region) Length() int {
+	return len(region)
+}
 
 func (region Region) PlantType() PlantType {
 	return region[0].plantType
 }
 
-func (region Region) FenceCost() int {
-    return len(region) * region.Perimeter()
-}
-
-func (region Region) Perimeter() int {
-    perimeter := 0
-    for _, plot := range region {
-        for _, neighbor := range plot.neighbors {
-            if neighbor == nil {
-                perimeter++
-            }
-        }
-    }
-    return perimeter
-}
-
-func (region Region) contains(plot *Plot) bool {
+func (region Region) containsPlot(plot *Plot) bool {
 	for _, existingPlot := range region {
 		if existingPlot.Equals(*plot) {
 			return true
@@ -54,13 +57,11 @@ func (region *Region) Sort() {
 
 func (region Region) String() string {
 	result := ""
-	tmp := region
-	tmp.Sort()
-	minRow := tmp[0].location.row
-	maxRow := tmp[len(tmp)-1].location.row
+	minRow := region[0].location.row
+	maxRow := region[region.Length()-1].location.row
 	minCol := math.MaxInt
 	maxCol := 0
-	for _, plot := range tmp {
+	for _, plot := range region {
 		if plot.location.col < minCol {
 			minCol = plot.location.col
 		}
@@ -81,4 +82,3 @@ func (region Region) String() string {
 	}
 	return result
 }
-

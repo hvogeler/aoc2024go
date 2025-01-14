@@ -90,6 +90,7 @@ func (garden *Garden) findRegions() {
 			if !plot.isAssignedToRegion {
                 region := new(Region)
 				plot.WalkPlot(region)
+				region.Sort()
                 garden.regions = append(garden.regions, *region)
 			}
 		}
