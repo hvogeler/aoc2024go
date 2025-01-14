@@ -91,6 +91,7 @@ func (garden *Garden) findRegions() {
                 region := new(Region)
 				plot.WalkPlot(region)
 				region.Sort()
+				region.setCorners()
                 garden.regions = append(garden.regions, *region)
 			}
 		}

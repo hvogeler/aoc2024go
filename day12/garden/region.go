@@ -7,7 +7,7 @@ import (
 
 type Region struct {
 	plots []Plot
-	// corners []Corner
+	corners []Corner
 }
 
 func (region Region) FenceCost() int {
@@ -26,8 +26,11 @@ func (region Region) Perimeter() int {
 	return perimeter
 }
 
-func (region Region) Sides() int {
-	return 42
+func (region *Region) setCorners() {
+	for _, plot := range region.plots {
+		corners := plot.Corners()
+		region.corners = append(region.corners, corners...)
+	}
 }
 
 func (region Region) Length() int {
