@@ -61,5 +61,4 @@ func Test_t1(t *testing.T) {
 			t.Errorf("Wrong y offset button B: %d", machine.btnB.yOffset)
 		}
 	})
-
 }

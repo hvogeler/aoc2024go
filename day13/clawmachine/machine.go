@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+// --------------------------------------------
+//   Machine
+// --------------------------------------------
+
 type Machine struct {
 	btnA    Button
 	btnB    Button
@@ -15,16 +19,6 @@ type Machine struct {
 
 func (machine Machine) String() string {
 	return fmt.Sprintf("Prize at %s\n  %s\n  %s", machine.prizeAt, machine.btnA, machine.btnB)
-}
-
-type Button struct {
-	name    string
-	xOffset int
-	yOffset int
-}
-
-func (btn Button) String() string {
-	return fmt.Sprintf("Button %s. Offsets x=%d, y=%d", btn.name, btn.xOffset, btn.yOffset)
 }
 
 func machinefromStr(s string) Machine {
@@ -57,4 +51,19 @@ func machinefromStr(s string) Machine {
         }
 	}
 	return *machine
+}
+
+
+// --------------------------------------------
+//   Button
+// --------------------------------------------
+
+type Button struct {
+	name    string
+	xOffset int
+	yOffset int
+}
+
+func (btn Button) String() string {
+	return fmt.Sprintf("Button %s. Offsets x=%d, y=%d", btn.name, btn.xOffset, btn.yOffset)
 }
