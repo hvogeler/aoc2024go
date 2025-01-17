@@ -6,7 +6,7 @@ import (
 )
 
 type Region struct {
-	plots []Plot
+	plots   []Plot
 	corners []Corner
 }
 
@@ -75,16 +75,16 @@ func (region *Region) Sort() {
 
 func (region Region) String() string {
 	result := ""
-	minRow := region.plots[0].location.row
-	maxRow := region.plots[region.Length()-1].location.row
+	minRow := region.plots[0].location.x
+	maxRow := region.plots[region.Length()-1].location.x
 	minCol := math.MaxInt
 	maxCol := 0
 	for _, plot := range region.plots {
-		if plot.location.col < minCol {
-			minCol = plot.location.col
+		if plot.location.y < minCol {
+			minCol = plot.location.y
 		}
-		if plot.location.col > maxCol {
-			maxCol = plot.location.col
+		if plot.location.y > maxCol {
+			maxCol = plot.location.y
 		}
 	}
 

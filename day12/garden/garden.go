@@ -13,19 +13,19 @@ type Garden struct {
 }
 
 func (garden Garden) FenceCost() int {
-    fenceCost := 0
-    for _, region := range garden.regions {
-        fenceCost += region.FenceCost()
-    }
-    return fenceCost
+	fenceCost := 0
+	for _, region := range garden.regions {
+		fenceCost += region.FenceCost()
+	}
+	return fenceCost
 }
 
 func (garden Garden) FenceCost2() int {
-    fenceCost := 0
-    for _, region := range garden.regions {
-        fenceCost += region.FenceCost2()
-    }
-    return fenceCost
+	fenceCost := 0
+	for _, region := range garden.regions {
+		fenceCost += region.FenceCost2()
+	}
+	return fenceCost
 }
 
 func (garden Garden) String() string {
@@ -57,10 +57,10 @@ func GardenFromStr(data string) Garden {
 		garden.area = append(garden.area, row)
 		rowno++
 	}
-	
+
 	garden.dimensions = Dimensions{rowno, len(garden.area[0])}
 	garden.checkNeighbors()
-    garden.findRegions()
+	garden.findRegions()
 	return *garden
 }
 
@@ -69,8 +69,8 @@ func (garden *Garden) checkNeighbors() {
 		for col := 0; col < garden.dimensions.cols; col++ {
 			plot := &garden.area[row][col]
 
-			plotRow := plot.location.row
-			plotCol := plot.location.col
+			plotRow := plot.location.x
+			plotCol := plot.location.y
 			// check above
 			if plotRow > 0 && garden.area[plotRow-1][plotCol].plantType == plot.plantType {
 				plot.neighbors[above] = &garden.area[plotRow-1][plotCol]
@@ -96,11 +96,11 @@ func (garden *Garden) findRegions() {
 		for col := 0; col < garden.dimensions.cols; col++ {
 			plot := &garden.area[row][col]
 			if !plot.isAssignedToRegion {
-                region := new(Region)
+				region := new(Region)
 				plot.WalkPlot(region)
 				region.Sort()
 				region.setCorners()
-                garden.regions = append(garden.regions, *region)
+				garden.regions = append(garden.regions, *region)
 			}
 		}
 	}

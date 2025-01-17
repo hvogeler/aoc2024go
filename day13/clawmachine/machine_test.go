@@ -21,9 +21,64 @@ const bad2 = `Button A: X+69, Y+23
 Button B: X+27, Y+71
 Prize: X=18641, Y=1027`
 
+func Test_good(t *testing.T) {
+	t.Run("good2", func(t *testing.T) {
+		machine := MachinefromStr(good2)
+		totalPressesA, totalPressesB := machine.FindPrize()
+		fmt.Printf("Total Presses A: %v\n", totalPressesA)
+		fmt.Printf("Total Presses B: %v\n", totalPressesB)
+		cost, err := LowestCost(totalPressesA, totalPressesB)
+		if err != nil {
+			t.Errorf("failed")
+		}
+
+		fmt.Printf("Lowest Cost: %d tokens\n", cost)
+	})
+
+	t.Run("good1", func(t *testing.T) {
+		machine := MachinefromStr(good1)
+		totalPressesA, totalPressesB := machine.FindPrize()
+		fmt.Printf("Total Presses A: %v\n", totalPressesA)
+		fmt.Printf("Total Presses B: %v\n", totalPressesB)
+		cost, err := LowestCost(totalPressesA, totalPressesB)
+		if err != nil {
+			t.Errorf("failed")
+		}
+
+		fmt.Printf("Lowest Cost: %d tokens\n", cost)
+	})
+}
+
+func Test_bad(t *testing.T) {
+	t.Run("bad1", func(t *testing.T) {
+		machine := MachinefromStr(bad1)
+		totalPressesA, totalPressesB := machine.FindPrize()
+		fmt.Printf("Total Presses A: %v\n", totalPressesA)
+		fmt.Printf("Total Presses B: %v\n", totalPressesB)
+		cost, err := LowestCost(totalPressesA, totalPressesB)
+		if err == nil {
+			t.Errorf("Should have failed")
+		}
+		fmt.Printf("Lowest Cost: %d tokens\n", cost)
+	})
+
+	t.Run("bad2", func(t *testing.T) {
+		machine := MachinefromStr(bad2)
+		totalPressesA, totalPressesB := machine.FindPrize()
+		fmt.Printf("Total Presses A: %v\n", totalPressesA)
+		fmt.Printf("Total Presses B: %v\n", totalPressesB)
+		cost, err := LowestCost(totalPressesA, totalPressesB)
+		if err == nil {
+			t.Errorf("Should have failed")
+		}
+		fmt.Printf("Lowest Cost: %d tokens\n", cost)
+
+	})
+}
+
 func Test_t1(t *testing.T) {
 	t.Run("read good1", func(t *testing.T) {
-		machine := machinefromStr(good1)
+		machine := MachinefromStr(good1)
 		fmt.Println(machine)
 		if machine.prizeAt != (Location{8400, 5400}) {
 			t.Errorf("Wrong location")
@@ -43,7 +98,7 @@ func Test_t1(t *testing.T) {
 	})
 
 	t.Run("read bad1", func(t *testing.T) {
-		machine := machinefromStr(bad1)
+		machine := MachinefromStr(bad1)
 		fmt.Println(machine)
 		if machine.prizeAt != (Location{12748, 12176}) {
 			t.Errorf("Wrong location")
