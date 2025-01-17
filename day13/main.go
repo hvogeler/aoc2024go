@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	bytes, err := os.ReadFile("testdata.dat")
+	bytes, err := os.ReadFile("example.dat")
 	if err != nil {
 		panic(err)
 	}
@@ -20,6 +20,7 @@ func main() {
 	sumTokens := 0
 	for i, game := range games {
 		machine := clawmachine.MachinefromStr(game)
+		machine.IncreasePrizeLocationForPart2(10000000000000)
 		totalPressesA, totalPressesB := machine.FindPrize()
 		cost, err := clawmachine.LowestCost(totalPressesA, totalPressesB)
 		if err == nil {
@@ -29,8 +30,8 @@ func main() {
 			fmt.Printf("Game %5d did not gain a prize\n", i+1)
 		}
 	}
-	fmt.Printf("Part1 game cost: %d tokens", sumTokens)
-	
+	fmt.Printf("Part2 game cost: %d tokens", sumTokens)
+	// Part1 Result: 33481
 
 }
 

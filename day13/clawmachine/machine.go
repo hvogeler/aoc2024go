@@ -23,6 +23,11 @@ func (machine Machine) String() string {
 	return fmt.Sprintf("Prize at %s\n  %s\n  %s", machine.prizeAt, machine.btnA, machine.btnB)
 }
 
+func (m *Machine) IncreasePrizeLocationForPart2(n int) {
+    m.prizeAt.x += n
+    m.prizeAt.y += n
+}
+
 func LowestCost(totalPressesA []int, totalPressesB []int) (int, *string) {
 	if len(totalPressesA) == 0 {
 		err := "prize not grabbed"
