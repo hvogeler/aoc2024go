@@ -36,7 +36,7 @@ func LowestCost(totalPressesA []int, totalPressesB []int) (int, *string) {
 
 	minCost := math.MaxInt
 	for i, pressA := range totalPressesA {
-		cost := cost(pressA, totalPressesB[i])
+		cost := Cost(pressA, totalPressesB[i])
 		if cost < minCost {
 			minCost = cost
 		}
@@ -44,10 +44,39 @@ func LowestCost(totalPressesA []int, totalPressesB []int) (int, *string) {
 	return minCost, nil
 }
 
-func cost(pressesA int, pressesB int) int {
+func Cost(pressesA int, pressesB int) int {
 	return pressesA*3 + pressesB*1
 }
 
+// Cramersche Regel, linear equations
+func (m Machine) FindPrize2() (int, int, *string) {
+    // a1x + b1y = c1
+    // a2x + b2y = c2
+    a1 := m.btnA.xOffset
+    b1 := m.btnB.xOffset
+    c1 := m.prizeAt.x
+
+    a2 := m.btnA.yOffset
+    b2 := m.btnB.yOffset
+    c2 := m.prizeAt.y
+
+    deter := (a1 * b2) - (a2 * b1)
+    if deter == 0 {
+        err := "No unique result. Equations collinear"
+        return 0, 0, &err
+    }
+
+    xpre := (c1 * b2) - (c2 * b1)
+    ypre := (a1 * c2) - (a2 * c1)
+    if xpre % deter == 0 && ypre % deter == 0 {
+        return xpre / deter, ypre / deter, nil
+    } else {
+        err := "Prize can not be reached"
+        return 0, 0, &err
+    }
+}
+
+// Brute force walk of all moves
 func (m *Machine) FindPrize() ([]int, []int) {
 	// Do 1 step button A then
 	//   do many steps Button B until x or y is > than prize

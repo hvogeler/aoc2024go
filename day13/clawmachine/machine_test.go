@@ -21,6 +21,73 @@ const bad2 = `Button A: X+69, Y+23
 Button B: X+27, Y+71
 Prize: X=18641, Y=1027`
 
+const bad3 = `Button A: X+69, Y+23
+Button B: X+138, Y+46
+Prize: X=18641, Y=18641`
+
+func Test_func2(t *testing.T) {
+	t.Run("good1", func(t *testing.T) {
+		machine := MachinefromStr(good1)
+		totalPressesA, totalPressesB, err := machine.FindPrize2()
+		if err != nil {
+			t.Errorf("%s", *err)
+		}
+
+		fmt.Printf("Total Presses A: %v\n", totalPressesA)
+		fmt.Printf("Total Presses B: %v\n", totalPressesB)
+		cost := Cost(totalPressesA, totalPressesB)
+
+		fmt.Printf("Lowest Cost: %d tokens\n", cost)
+	})
+
+	t.Run("good2", func(t *testing.T) {
+		machine := MachinefromStr(good2)
+		totalPressesA, totalPressesB, err := machine.FindPrize2()
+		if err != nil {
+			t.Errorf("%s", *err)
+		}
+
+		fmt.Printf("Total Presses A: %v\n", totalPressesA)
+		fmt.Printf("Total Presses B: %v\n", totalPressesB)
+		cost := Cost(totalPressesA, totalPressesB)
+
+		fmt.Printf("Lowest Cost: %d tokens\n", cost)
+	})
+
+	t.Run("bad1", func(t *testing.T) {
+		machine := MachinefromStr(bad1)
+		totalPressesA, totalPressesB, err := machine.FindPrize2()
+		if err != nil {
+			fmt.Printf("Prize not reached. Reason: %s\n", *err)
+		} else {
+			t.Errorf("Prize should not be reachable, but got A(%d) B(%d)", totalPressesA, totalPressesB)
+		}
+
+	})
+
+	t.Run("bad2", func(t *testing.T) {
+		machine := MachinefromStr(bad2)
+		totalPressesA, totalPressesB, err := machine.FindPrize2()
+		if err != nil {
+			fmt.Printf("Prize not reached. Reason: %s\n", *err)
+		} else {
+			t.Errorf("Prize should not be reachable, but got A(%d) B(%d)", totalPressesA, totalPressesB)
+		}
+
+	})
+
+	t.Run("bad3", func(t *testing.T) {
+		machine := MachinefromStr(bad3)
+		totalPressesA, totalPressesB, err := machine.FindPrize2()
+		if err != nil {
+			fmt.Printf("Prize not reached. Reason: %s\n", *err)
+		} else {
+			t.Errorf("Prize should not be reachable, but got A(%d) B(%d)", totalPressesA, totalPressesB)
+		}
+
+	})
+}
+
 func Test_good(t *testing.T) {
 	t.Run("good2", func(t *testing.T) {
 		machine := MachinefromStr(good2)

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	bytes, err := os.ReadFile("example.dat")
+	bytes, err := os.ReadFile("testdata.dat")
 	if err != nil {
 		panic(err)
 	}
@@ -20,18 +20,33 @@ func main() {
 	sumTokens := 0
 	for i, game := range games {
 		machine := clawmachine.MachinefromStr(game)
-		machine.IncreasePrizeLocationForPart2(10000000000000)
 		totalPressesA, totalPressesB := machine.FindPrize()
 		cost, err := clawmachine.LowestCost(totalPressesA, totalPressesB)
 		if err == nil {
 			fmt.Printf("Game %5d costs %d tokens\n", i+1, cost)
 			sumTokens += cost
 		} else {
-			fmt.Printf("Game %5d did not gain a prize\n", i+1)
+			fmt.Printf("Game %5d did not gain a prize: %s\n", i+1, *err)
 		}
 	}
-	fmt.Printf("Part2 game cost: %d tokens", sumTokens)
+	fmt.Printf("Part1 game cost: %d tokens\n\n", sumTokens)
 	// Part1 Result: 33481
+
+	sumTokens = 0
+	for i, game := range games {
+		machine := clawmachine.MachinefromStr(game)
+		machine.IncreasePrizeLocationForPart2(10000000000000)
+		totalPressesA, totalPressesB, err := machine.FindPrize2()
+		if err == nil {
+            cost := clawmachine.Cost(totalPressesA, totalPressesB)
+			fmt.Printf("Game %5d costs %d tokens\n", i+1, cost)
+			sumTokens += cost
+		} else {
+			fmt.Printf("Game %5d did not gain a prize: %s\n", i+1, *err)
+		}
+	}
+	fmt.Printf("Part2 game cost: %d tokens\n", sumTokens)
+
 
 }
 
