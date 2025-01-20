@@ -5,6 +5,49 @@ import (
 	"testing"
 )
 
+func Test_xmas_tree(t *testing.T) {
+
+	t.Run("Move Robots", func(t *testing.T) {
+		data := ReadData("../testdata.dat")
+		space := SpaceFromString(data, Dimensions{101, 103})
+
+		for i := 400000; i < 500000; i++ {
+			space.MoveRobots(1)
+			xmasTree := true
+		Loop1:
+			for x := 40; x < 60; x++ {
+				if space.Tile(x, 40).CountRobots() == 0 {
+					xmasTree = false
+					break Loop1
+				}
+			}
+			if xmasTree {
+				fmt.Println(space)
+				fmt.Println(i)
+
+			}
+		}
+	})
+
+	t.Run("Move Robots1", func(t *testing.T) {
+		data := ReadData("../testdata.dat")
+		space := SpaceFromString(data, Dimensions{101, 103})
+		// fmt.Println(space)
+
+		for i := 700000; i < 900000; i++ {
+			space.MoveRobots(1)
+			if space.Tile(50, 0).CountRobots() > 0 &&
+				space.Tile(49, 1).CountRobots() > 0 &&
+				space.Tile(51, 1).CountRobots() > 0 &&
+				space.Tile(48, 2).CountRobots() > 0 &&
+				space.Tile(52, 2).CountRobots() > 0 {
+				fmt.Println(space)
+				fmt.Println(i)
+			}
+		}
+	})
+}
+
 func Test_space(t *testing.T) {
 
 	t.Run("Move Robot", func(t *testing.T) {
@@ -37,7 +80,7 @@ func Test_space(t *testing.T) {
 		fmt.Println(space)
 		space.MoveRobots(100)
 		fmt.Println(space)
-		
+
 		if space.SafetyFactor() != 12 {
 			t.Errorf("Expected safety factor 12, got %d", space.SafetyFactor())
 		}
