@@ -1,12 +1,13 @@
 package robots
 
 type Robot struct {
-	position Location
+	id int
 	velocity Velocity
+	tile *Tile
 }
 
-func NewRobot(loc Location, v Velocity) Robot {
-	return Robot{loc, v}
+func NewRobot(id int, v Velocity) *Robot {
+	return &Robot{id, v, nil}
 }
 
 
