@@ -12,12 +12,42 @@ type Space struct {
 	dimensions Dimensions
 }
 
+func (space *Space) MoveRobots(seconds int) {
+	for i := range space.robots {
+		space.MoveRobot(i, seconds)
+	}
+}
+
+func (space *Space) MoveRobot(robotIdx int, seconds int) {
+	if robotIdx > len(space.robots) {
+		return
+	}
+	robot := space.robots[robotIdx]
+	pos := robot.tile.location
+	newX := MathMod(pos.x+robot.velocity.x*seconds, space.dimensions.tilesX)
+	newY := MathMod(pos.y+robot.velocity.y*seconds, space.dimensions.tilesY)
+	space.Tile(pos.x, pos.y).RemoveRobot(robot)
+	if space.Tile(pos.x, pos.y).CountRobots() == 0 {
+		delete(space.tiles, Location{pos.x, pos.y})
+	}
+	space.PlaceRobotOnTile(robot, Location{newX, newY})
+}
+
+// in Go modulo keeps the sign :-(
+func MathMod(a, b int) int {
+	m := a % b
+	if m < 0 {
+		m += b
+	}
+	return m
+}
+
 func (space Space) String() string {
 	s := ""
 	for y := 0; y < space.dimensions.tilesY; y++ {
 		for x := 0; x < space.dimensions.tilesX; x++ {
 			if tile, exists := space.tiles[Location{x, y}]; exists {
-				s += fmt.Sprintf("%d", tile.countRobots())
+				s += fmt.Sprintf("%d", tile.CountRobots())
 			} else {
 				s += "."
 			}
@@ -55,18 +85,33 @@ func (space Space) CountQuadrant(quadrant Quadrant) int {
 	sumRobots := 0
 	for y := loc.y; y < loc.y+dim.tilesY; y++ {
 		for x := loc.x; x < loc.x+dim.tilesX; x++ {
-			sumRobots += space.Tile(x, y).countRobots()
+			sumRobots += space.Tile(x, y).CountRobots()
 		}
 	}
 	return sumRobots
 }
 
-func (space Space) CountAllQuadrants() int {
-	sum := 0
+func (space Space) SafetyFactor() int {
+	sum := 1
 	for i := topLeft; i <= bottomRight; i++ {
-		sum += space.CountQuadrant(Quadrant(i))
+		sum *= space.CountQuadrant(Quadrant(i))
 	}
 	return sum
+}
+
+func (space *Space) PlaceRobotOnTile(robot *Robot, location Location) {
+	if tile, exists := space.tiles[location]; exists {
+		robot.tile = tile
+		// tile.robots = append(tile.robots, robot)
+		tile.AddRobot(robot)
+	} else {
+		tile := new(Tile)
+		tile.location = location
+		// tile.robots = append(tile.robots, robot)
+		tile.AddRobot(robot)
+		robot.tile = tile
+		space.tiles[location] = tile
+	}
 }
 
 func SpaceFromString(s string, dim Dimensions) Space {
@@ -81,17 +126,19 @@ func SpaceFromString(s string, dim Dimensions) Space {
 		velocity := VelocityFromString(parts[1])
 		robot := NewRobot(id, Velocity(velocity))
 		space.robots = append(space.robots, robot)
-
-		if tile, exists := space.tiles[location]; exists {
-			robot.tile = tile
-			tile.robots = append(tile.robots, robot)
-		} else {
-			tile := new(Tile)
-			tile.location = location
-			tile.robots = append(tile.robots, robot)
-			robot.tile = tile
-			space.tiles[location] = tile
-		}
+		space.PlaceRobotOnTile(robot, location)
+		// if tile, exists := space.tiles[location]; exists {
+		// 	robot.tile = tile
+		// 	// tile.robots = append(tile.robots, robot)
+		// 	tile.AddRobot(robot)
+		// } else {
+		// 	tile := new(Tile)
+		// 	tile.location = location
+		// 	// tile.robots = append(tile.robots, robot)
+		// 	tile.AddRobot(robot)
+		// 	robot.tile = tile
+		// 	space.tiles[location] = tile
+		// }
 	}
 	return *space
 }
