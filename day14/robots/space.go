@@ -3,7 +3,6 @@ package robots
 import (
 	"bufio"
 	"fmt"
-	// "fmt"
 	"strings"
 )
 
@@ -29,7 +28,11 @@ func (space Space) String() string {
 }
 
 func (space Space) Tile(x, y int) *Tile {
-	return space.tiles[Location{x, y}]
+	if tile, exists := space.tiles[Location{x, y}]; exists {
+		return tile
+	} else {
+		return new(Tile)
+	}
 }
 
 func (space Space) QuadrantCoords(quadrant Quadrant) (Location, Dimensions) {
@@ -45,6 +48,25 @@ func (space Space) QuadrantCoords(quadrant Quadrant) (Location, Dimensions) {
 		return Location{quadrantDimensions.tilesX + 1, quadrantDimensions.tilesY + 1}, quadrantDimensions
 	}
 	panic("Switch exhausted")
+}
+
+func (space Space) CountQuadrant(quadrant Quadrant) int {
+	loc, dim := space.QuadrantCoords(quadrant)
+	sumRobots := 0
+	for y := loc.y; y < loc.y+dim.tilesY; y++ {
+		for x := loc.x; x < loc.x+dim.tilesX; x++ {
+			sumRobots += space.Tile(x, y).countRobots()
+		}
+	}
+	return sumRobots
+}
+
+func (space Space) CountAllQuadrants() int {
+	sum := 0
+	for i := topLeft; i <= bottomRight; i++ {
+		sum += space.CountQuadrant(Quadrant(i))
+	}
+	return sum
 }
 
 func SpaceFromString(s string, dim Dimensions) Space {
