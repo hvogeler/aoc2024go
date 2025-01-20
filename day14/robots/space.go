@@ -24,8 +24,8 @@ func (space *Space) MoveRobot(robotIdx int, seconds int) {
 	}
 	robot := space.robots[robotIdx]
 	pos := robot.tile.location
-	newX := MathMod(pos.x+robot.velocity.x*seconds, space.dimensions.tilesX)
-	newY := MathMod(pos.y+robot.velocity.y*seconds, space.dimensions.tilesY)
+	newX := MathMod(pos.x+robot.velocity.x*seconds, space.dimensions.TilesX)
+	newY := MathMod(pos.y+robot.velocity.y*seconds, space.dimensions.TilesY)
 	space.Tile(pos.x, pos.y).RemoveRobot(robot)
 	if space.Tile(pos.x, pos.y).CountRobots() == 0 {
 		delete(space.tiles, Location{pos.x, pos.y})
@@ -44,8 +44,8 @@ func MathMod(a, b int) int {
 
 func (space Space) String() string {
 	s := ""
-	for y := 0; y < space.dimensions.tilesY; y++ {
-		for x := 0; x < space.dimensions.tilesX; x++ {
+	for y := 0; y < space.dimensions.TilesY; y++ {
+		for x := 0; x < space.dimensions.TilesX; x++ {
 			if tile, exists := space.tiles[Location{x, y}]; exists {
 				s += fmt.Sprintf("%d", tile.CountRobots())
 			} else {
@@ -66,16 +66,16 @@ func (space Space) Tile(x, y int) *Tile {
 }
 
 func (space Space) QuadrantCoords(quadrant Quadrant) (Location, Dimensions) {
-	quadrantDimensions := Dimensions{(space.dimensions.tilesX - 1) / 2, (space.dimensions.tilesY - 1) / 2}
+	quadrantDimensions := Dimensions{(space.dimensions.TilesX - 1) / 2, (space.dimensions.TilesY - 1) / 2}
 	switch quadrant {
 	case topLeft:
 		return Location{0, 0}, quadrantDimensions
 	case topRight:
-		return Location{quadrantDimensions.tilesX + 1, 0}, quadrantDimensions
+		return Location{quadrantDimensions.TilesX + 1, 0}, quadrantDimensions
 	case bottomLeft:
-		return Location{0, quadrantDimensions.tilesY + 1}, quadrantDimensions
+		return Location{0, quadrantDimensions.TilesY + 1}, quadrantDimensions
 	case bottomRight:
-		return Location{quadrantDimensions.tilesX + 1, quadrantDimensions.tilesY + 1}, quadrantDimensions
+		return Location{quadrantDimensions.TilesX + 1, quadrantDimensions.TilesY + 1}, quadrantDimensions
 	}
 	panic("Switch exhausted")
 }
@@ -83,8 +83,8 @@ func (space Space) QuadrantCoords(quadrant Quadrant) (Location, Dimensions) {
 func (space Space) CountQuadrant(quadrant Quadrant) int {
 	loc, dim := space.QuadrantCoords(quadrant)
 	sumRobots := 0
-	for y := loc.y; y < loc.y+dim.tilesY; y++ {
-		for x := loc.x; x < loc.x+dim.tilesX; x++ {
+	for y := loc.y; y < loc.y+dim.TilesY; y++ {
+		for x := loc.x; x < loc.x+dim.TilesX; x++ {
 			sumRobots += space.Tile(x, y).CountRobots()
 		}
 	}
@@ -144,8 +144,8 @@ func SpaceFromString(s string, dim Dimensions) Space {
 }
 
 type Dimensions struct {
-	tilesX int
-	tilesY int
+	TilesX int
+	TilesY int
 }
 
 type Quadrant int
