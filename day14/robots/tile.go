@@ -1,5 +1,7 @@
 package robots
 
+import "fmt"
+
 type Tile struct {
 	location Location
 	robots   []*Robot
@@ -27,4 +29,8 @@ func (tile Tile) FindRobot(robotToRemove *Robot) (int, bool) {
 		}
 	}
 	return -1, false
+}
+
+func (tile Tile) String() string {
+	return fmt.Sprintf("Tile %s has %d robots\n", tile.location, len(tile.robots))
 }

@@ -12,6 +12,26 @@ type Space struct {
 	dimensions Dimensions
 }
 
+func (space Space) FindXmasTree() (*Tile, bool) {
+	for _, robot := range space.robots {
+		loc := robot.tile.location
+		clusterFound := true
+	mainLoop:
+		for y := loc.y - 1; y <= loc.y+1; y++ {
+			for x := loc.x - 1; x <= loc.x+1; x++ {
+				if _, exists := space.tiles[Location{x, y}]; !exists {
+					clusterFound = false
+					break mainLoop
+				}
+			}
+		}
+		if clusterFound {
+			return robot.tile, true
+		}
+	}
+	return nil, false
+}
+
 func (space *Space) MoveRobots(seconds int) {
 	for i := range space.robots {
 		space.MoveRobot(i, seconds)
@@ -52,7 +72,7 @@ func (space Space) String() string {
 				s += "."
 			}
 		}
-		s += "\n"
+		s += fmt.Sprintf("\n%d. ", y)
 	}
 	return s
 }
@@ -102,12 +122,10 @@ func (space Space) SafetyFactor() int {
 func (space *Space) PlaceRobotOnTile(robot *Robot, location Location) {
 	if tile, exists := space.tiles[location]; exists {
 		robot.tile = tile
-		// tile.robots = append(tile.robots, robot)
 		tile.AddRobot(robot)
 	} else {
 		tile := new(Tile)
 		tile.location = location
-		// tile.robots = append(tile.robots, robot)
 		tile.AddRobot(robot)
 		robot.tile = tile
 		space.tiles[location] = tile
@@ -127,18 +145,6 @@ func SpaceFromString(s string, dim Dimensions) Space {
 		robot := NewRobot(id, Velocity(velocity))
 		space.robots = append(space.robots, robot)
 		space.PlaceRobotOnTile(robot, location)
-		// if tile, exists := space.tiles[location]; exists {
-		// 	robot.tile = tile
-		// 	// tile.robots = append(tile.robots, robot)
-		// 	tile.AddRobot(robot)
-		// } else {
-		// 	tile := new(Tile)
-		// 	tile.location = location
-		// 	// tile.robots = append(tile.robots, robot)
-		// 	tile.AddRobot(robot)
-		// 	robot.tile = tile
-		// 	space.tiles[location] = tile
-		// }
 	}
 	return *space
 }
