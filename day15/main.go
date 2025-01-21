@@ -6,6 +6,9 @@ import (
 )
 
 func main() {
-	data := wh.ReadData("example.dat")
-	fmt.Println(data)
+	data := wh.ReadData("testdata.dat")
+	warehouse := wh.WarehouseFromStr(data)
+	warehouse.GoRobotGo()
+	fmt.Printf("Sum Part1: %d\n", warehouse.SumBoxCoords())
+	// Result PArt1: 1463715
 }

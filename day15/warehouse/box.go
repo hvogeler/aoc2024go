@@ -11,5 +11,5 @@ func NewBox(x, y int) Box {
 }
 
 func (box Box) GpsCoord() int {
-	return box.position.y * 100 + box.position.y
+	return (box.position.y)* 100 + box.position.x
 }

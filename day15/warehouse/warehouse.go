@@ -13,6 +13,63 @@ type Warehouse struct {
 	dimensions Dimensions
 }
 
+func (wh *Warehouse) Move(objectAt *Location, direction Pointer) {
+	nextPosition := new(Location)
+	switch direction {
+	case right:
+		nextPosition.x = objectAt.x + 1
+		nextPosition.y = objectAt.y
+	case left:
+		nextPosition.x = objectAt.x - 1
+		nextPosition.y = objectAt.y
+	case up:
+		nextPosition.x = objectAt.x
+		nextPosition.y = objectAt.y - 1
+	case down:
+		nextPosition.x = objectAt.x
+		nextPosition.y = objectAt.y + 1
+	default:
+		panic("Exhausted switch")
+	}
+
+	if wh.ObjectTypeAt(*nextPosition) == WallType {
+		return
+	}
+
+	if wh.ObjectTypeAt(*nextPosition) == BoxType {
+		wh.Move(nextPosition, direction)
+	}
+
+	if wh.ObjectTypeAt(*nextPosition) == UnusedType {
+		switch wh.ObjectTypeAt(*objectAt) {
+		case BoxType:
+			box := wh.boxes[*objectAt]
+			box.position = *nextPosition
+			wh.boxes[*nextPosition] = box
+			delete(wh.boxes, *objectAt)
+			return
+		case RobotType:
+			wh.robot.position = *nextPosition
+			return
+		}
+	}
+}
+
+func (wh *Warehouse) GoRobotGo() {
+	for i := 0; i < wh.robotPath.Length(); i++ {
+		ptr := wh.robotPath.NextPointer()
+		wh.Move(&wh.robot.position, ptr)
+	}
+}
+
+func (wh Warehouse) SumBoxCoords() int {
+	sum := 0
+	for _, v := range wh.boxes {
+		sum += v.GpsCoord()
+	}
+	return sum
+}
+
 func NewWarehouse() Warehouse {
 	wh := new(Warehouse)
 	wh.boxes = make(map[Location]Box)
@@ -74,8 +131,7 @@ WarehouseLoop:
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		pointers := []rune(line)
-		for _, pointer := range pointers {
+		for _, pointer := range line {
 			wh.robotPath.pointers = append(wh.robotPath.pointers, Pointer(pointer))
 		}
 	}
