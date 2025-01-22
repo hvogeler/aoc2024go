@@ -116,7 +116,7 @@ WarehouseLoop:
 		}
 		runes := []rune(line)
 		for x, rne := range runes {
-			switch rne {
+			switch string(rne) {
 			case WallRune:
 				wh.walls[NewLocation(x, y)] = NewWall(x, y)
 			case BoxRune:
@@ -143,9 +143,9 @@ type Dimensions struct {
 	y int
 }
 
-const UnusedRune rune = '.'
+const UnusedRune string = "."
 
-type ObjectType rune
+type ObjectType string
 
 const (
 	WallType   ObjectType = ObjectType(WallRune)

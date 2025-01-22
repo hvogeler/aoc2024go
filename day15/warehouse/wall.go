@@ -1,6 +1,6 @@
 package warehouse
 
-const WallRune rune = '#'
+const WallRune string = "#"
 
 type Wall struct {
 	position Location

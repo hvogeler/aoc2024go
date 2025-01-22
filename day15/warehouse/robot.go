@@ -1,6 +1,6 @@
 package warehouse
 
-const RobotRune rune = '@'
+const RobotRune string = "@"
 
 type Robot struct {
 	position Location

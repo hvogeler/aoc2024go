@@ -1,6 +1,6 @@
 package warehouse
 
-const BoxRune rune = 'O'
+const BoxRune string = "O"
 
 type Box struct {
 	position Location
