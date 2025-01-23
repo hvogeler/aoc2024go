@@ -5,6 +5,15 @@ import (
 	"testing"
 )
 
+func Test_FromString2(t *testing.T) {
+	t.Run("Example Data", func(t *testing.T) {
+		data := ReadData("../example.dat")
+		// fmt.Println(data)
+		wh := WarehouseFromStr2(data)
+		fmt.Println(wh)
+	})
+}
+
 func Test_xmas_tree(t *testing.T) {
 	t.Run("Example1 Data", func(t *testing.T) {
 		data := ReadData("../example1.dat")

@@ -19,6 +19,14 @@ func (loc Location) String() string {
 	return fmt.Sprintf("(%d, %d)", loc.x, loc.y)
 }
 
+func (loc Location) X() int {
+	return loc.x
+}
+
+func (loc Location) Y() int {
+	return loc.y
+}
+
 func (loca Location) Compare(locb Location) int {
 	if loca == locb {
 		return 0

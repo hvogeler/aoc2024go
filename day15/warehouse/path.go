@@ -26,3 +26,7 @@ func (p *Path) NextPointer() Pointer {
 func (p Path) Length() int {
 	return len(p.pointers)
 }
+
+func (p *Path) AddPointer(ptr Pointer) {
+	p.pointers = append(p.pointers, ptr)
+}

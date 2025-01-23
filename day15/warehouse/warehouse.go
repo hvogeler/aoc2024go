@@ -77,7 +77,7 @@ func NewWarehouse() Warehouse {
 	return *wh
 }
 
-func (wh Warehouse) String() string {
+func (wh Warehouse) String2() string {
 	s := ""
 	for y := 0; y < wh.dimensions.y; y++ {
 		for x := 0; x < wh.dimensions.x; x++ {
@@ -88,6 +88,16 @@ func (wh Warehouse) String() string {
 	return s
 }
 
+func (wh Warehouse) String() string {
+	s := ""
+	for y := 0; y < wh.dimensions.y; y++ {
+		for x := 0; x < wh.dimensions.x; x++ {
+			s += wh.ObjectTypeAt(NewLocation(x, y)).String()
+		}
+		s += "\n"
+	}
+	return s
+}
 func (wh Warehouse) ObjectTypeAt(position Location) ObjectType {
 	if _, exists := wh.boxes[position]; exists {
 		return BoxType
@@ -119,7 +129,7 @@ WarehouseLoop:
 			switch string(rne) {
 			case WallRune:
 				wh.walls[NewLocation(x, y)] = NewWall(x, y)
-			case BoxRune:
+			case BoxStr1:
 				wh.boxes[NewLocation(x, y)] = NewBox(x, y)
 			case RobotRune:
 				wh.robot = NewRobot(x, y)
@@ -149,7 +159,7 @@ type ObjectType string
 
 const (
 	WallType   ObjectType = ObjectType(WallRune)
-	BoxType    ObjectType = ObjectType(BoxRune)
+	BoxType    ObjectType = ObjectType(BoxStr1)
 	RobotType  ObjectType = ObjectType(RobotRune)
 	UnusedType ObjectType = ObjectType(UnusedRune)
 )
