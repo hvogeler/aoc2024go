@@ -27,6 +27,14 @@ func (loc Location) Y() int {
 	return loc.y
 }
 
+func (loc *Location) SetX(x int) {
+	loc.x = x
+}
+
+func (loc *Location) SetY(y int) {
+	loc.y = y
+}
+
 func (loca Location) Compare(locb Location) int {
 	if loca == locb {
 		return 0

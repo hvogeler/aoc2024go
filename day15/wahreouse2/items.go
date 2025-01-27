@@ -1,7 +1,7 @@
 package warehouse2
 
 import (
-	wh "day15/warehouse"
+	wh1 "day15/warehouse"
 )
 
 const (
@@ -22,11 +22,12 @@ const (
 
 type Item interface {
 	Item() ItemType
-	PositionRight() wh.Location
-	PositionLeft() wh.Location
-	ItemAt(pos wh.Location) ItemPart
+	PositionRight() wh1.Location
+	PositionLeft() wh1.Location
+	ItemAt(pos wh1.Location) ItemPart
 	Length() int
 	String() string
+    SetPosition(loc wh1.Location)
 }
 
 type ItemPart int
@@ -38,7 +39,7 @@ const (
 )
 
 type Wall struct {
-	position wh.Location
+	position wh1.Location
 }
 
 func (wall Wall) Item() ItemType {
@@ -53,15 +54,15 @@ func (wall Wall) Length() int {
 	return 2
 }
 
-func (wall Wall) PositionLeft() wh.Location {
+func (wall Wall) PositionLeft() wh1.Location {
 	return wall.position
 }
 
-func (wall Wall) PositionRight() wh.Location {
-	return wh.NewLocation(wall.position.X()+1, wall.position.Y())
+func (wall Wall) PositionRight() wh1.Location {
+	return wh1.NewLocation(wall.position.X()+1, wall.position.Y())
 }
 
-func (wall Wall) ItemAt(pos wh.Location) ItemPart {
+func (wall Wall) ItemAt(pos wh1.Location) ItemPart {
 	switch pos {
 	case wall.PositionLeft():
 		return Left
@@ -72,14 +73,18 @@ func (wall Wall) ItemAt(pos wh.Location) ItemPart {
 	}
 }
 
+func (wall *Wall) SetPosition(loc wh1.Location) {
+    wall.position = loc
+}
+
 func NewWall(leftx int, lefty int) Wall {
 	wall := new(Wall)
-	wall.position = wh.NewLocation(leftx, lefty)
+	wall.position = wh1.NewLocation(leftx, lefty)
 	return *wall
 }
 
 type Box struct {
-	position wh.Location
+	position wh1.Location
 }
 
 func (box Box) Item() ItemType {
@@ -94,15 +99,15 @@ func (box Box) Length() int {
 	return 2
 }
 
-func (box Box) PositionLeft() wh.Location {
+func (box Box) PositionLeft() wh1.Location {
 	return box.position
 }
 
-func (box Box) PositionRight() wh.Location {
-	return wh.NewLocation(box.position.X()+1, box.position.Y())
+func (box Box) PositionRight() wh1.Location {
+	return wh1.NewLocation(box.position.X()+1, box.position.Y())
 }
 
-func (box Box) ItemAt(pos wh.Location) ItemPart {
+func (box Box) ItemAt(pos wh1.Location) ItemPart {
 	switch pos {
 	case box.PositionLeft():
 		return Left
@@ -113,8 +118,12 @@ func (box Box) ItemAt(pos wh.Location) ItemPart {
 	}
 }
 
+func (box *Box) SetPosition(loc wh1.Location) {
+    box.position = loc
+}
+
 func NewBox(leftx int, lefty int) Box {
 	box := new(Box)
-	box.position = wh.NewLocation(leftx, lefty)
+	box.position = wh1.NewLocation(leftx, lefty)
 	return *box
 }

@@ -16,16 +16,16 @@ type Warehouse struct {
 func (wh *Warehouse) Move(objectAt *Location, direction Pointer) {
 	nextPosition := new(Location)
 	switch direction {
-	case right:
+	case Right:
 		nextPosition.x = objectAt.x + 1
 		nextPosition.y = objectAt.y
-	case left:
+	case Left:
 		nextPosition.x = objectAt.x - 1
 		nextPosition.y = objectAt.y
-	case up:
+	case Up:
 		nextPosition.x = objectAt.x
 		nextPosition.y = objectAt.y - 1
-	case down:
+	case Down:
 		nextPosition.x = objectAt.x
 		nextPosition.y = objectAt.y + 1
 	default:

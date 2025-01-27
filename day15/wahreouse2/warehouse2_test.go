@@ -19,14 +19,14 @@ func Test_FromString2(t *testing.T) {
 
 		item, exists := wh.ItemAt(7, 0)
 		if exists {
-			if (*item).Item() != WallItem {
+			if item.Item() != WallItem {
 				t.Errorf("Expected Wall")
 			}
 		}
 
 		item, exists = wh.ItemAt(7, 1)
 		if exists {
-			if (*item).Item() != BoxItem || (*item).PositionRight() != wh1.NewLocation(7, 1) {
+			if item.Item() != BoxItem || item.PositionRight() != wh1.NewLocation(7, 1) {
 				t.Errorf("Expected Box")
 			}
 		} else {
@@ -34,7 +34,7 @@ func Test_FromString2(t *testing.T) {
 		}
 
 		item, exists = wh.ItemAt(6, 1)
-		if exists && (*item).Item() != BoxItem || (*item).PositionLeft() != wh1.NewLocation(6,1) {
+		if exists && item.Item() != BoxItem || item.PositionLeft() != wh1.NewLocation(6,1) {
 			t.Error("Expected Box")
 		}
 	})
@@ -43,6 +43,11 @@ func Test_FromString2(t *testing.T) {
 		// data := wh1.ReadData("../example.dat")
 		// fmt.Println(data)
 		wh := WarehouseFromStr(example2)
-		fmt.Println(wh)
+		for i := 0; i < wh.robotPath.Length(); i++ {
+			fmt.Println(wh)
+			ptr := wh.robotPath.NextPointer()
+			wh.Move(&wh.robot.position, ptr)
+		}
+	
 	})
 }

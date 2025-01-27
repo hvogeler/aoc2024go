@@ -3,10 +3,10 @@ package warehouse
 type Pointer rune
 
 const (
-	left  Pointer = '<'
-	right Pointer = '>'
-	up    Pointer = '^'
-	down  Pointer = 'v'
+	Left  Pointer = '<'
+	Right Pointer = '>'
+	Up    Pointer = '^'
+	Down  Pointer = 'v'
 )
 
 func (ptr Pointer) String() string {
