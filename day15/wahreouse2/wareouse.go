@@ -7,9 +7,9 @@ import (
 )
 
 type Warehouse struct {
-	robot Robot
-	items map[wh1.Location]Item
-	robotPath wh1.Path
+	robot      Robot
+	items      map[wh1.Location]Item
+	robotPath  wh1.Path
 	dimensions Dimensions
 }
 
@@ -17,6 +17,18 @@ func NewWarehouse() Warehouse {
 	wh := new(Warehouse)
 	wh.items = make(map[wh1.Location]Item)
 	return *wh
+}
+
+func (wh Warehouse) ItemAt(x, y int) (*Item, bool) {
+	item, exists := wh.items[wh1.NewLocation(x, y)]
+	if exists {
+		return &item, true
+	}
+	item, exists = wh.items[wh1.NewLocation(x - 1, y)]
+    if exists && item.Length() == 2{
+		return &item, true
+	}
+	return nil, false
 }
 
 func WarehouseFromStr(s string) Warehouse {
@@ -30,7 +42,7 @@ WarehouseLoop:
 			break WarehouseLoop
 		}
 		if wh.dimensions.x == 0 {
-			wh.dimensions.x = len(line)*2
+			wh.dimensions.x = len(line) * 2
 		}
 		runes := []rune(line)
 		xOut := 0
@@ -38,27 +50,22 @@ WarehouseLoop:
 			rne := runes[x]
 			switch rne {
 			case WallRune:
-				wall := NewWall(x, y)
-				wh.items[wh1.NewLocation(x, y)] = wall
-				wh.items[wh1.NewLocation(x + 1, y)] = wall
-				xOut += 2
+				wall := NewWall(xOut, y)
+				wh.items[wh1.NewLocation(xOut, y)] = wall
 			case BoxRune:
-				box := NewBox(x, y)
-				wh.items[wh1.NewLocation(x, y)] = box
-				wh.items[wh1.NewLocation(x + 1, y)] = box
-				xOut += 2
+				box := NewBox(xOut, y)
+				wh.items[wh1.NewLocation(xOut, y)] = box
 			case RobotRune:
-				wh.robot = NewRobot(x, y)
-				xOut += 2
+				wh.robot = NewRobot(xOut, y)
+				wh.items[wh1.NewLocation(xOut, y)] = wh.robot
 			case UnusedRune:
-				xOut += 2
 			default:
 				panic("Exhausted Switch")
 			}
+            xOut += 2
 		}
 		y++
 	}
-	wh.dimensions.x *= 2
 	wh.dimensions.y = y
 
 	for scanner.Scan() {
@@ -70,6 +77,24 @@ WarehouseLoop:
 	return wh
 }
 
+func (wh Warehouse) String() string {
+	var builder strings.Builder
+	for y := 0; y < wh.dimensions.y; y++ {
+		for x := 0; x < wh.dimensions.x; {
+			itemPtr, exists := wh.ItemAt(x, y)
+			if exists {
+				item := *itemPtr
+				builder.WriteString(item.String())
+                x += item.Length()
+			} else {
+				builder.WriteString(".")
+                x++
+			}
+		}
+		builder.WriteString("\n")
+	}
+	return builder.String()
+}
 
 type Dimensions struct {
 	x int
