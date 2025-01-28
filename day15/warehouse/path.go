@@ -9,9 +9,23 @@ const (
 	Down  Pointer = 'v'
 )
 
+func (ptr Pointer) Orientation() Orientation {
+	if ptr == Left || ptr == Right {
+		return Horizontal
+	} else {
+		return Vertical
+	}
+}
+
 func (ptr Pointer) String() string {
 	return string(ptr)
 }
+
+type Orientation int
+const (
+	Horizontal Orientation = iota
+	Vertical
+)
 
 type Path struct {
 	pointers []Pointer

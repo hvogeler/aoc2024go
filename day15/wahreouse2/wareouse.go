@@ -42,7 +42,7 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 	case wh1.Left:
 		nextPositionMove.SetX(currentItem.PositionLeft().X() - 1)
 		nextPositionMove.SetY(currentItem.PositionLeft().Y())
-		nextPositionTest.SetX(currentItem.PositionLeft().X() - currentItem.Length())
+		nextPositionTest.SetX(currentItem.PositionLeft().X() - 1) //currentItem.Length())
 		nextPositionTest.SetY(currentItem.PositionLeft().Y())
 	case wh1.Up:
 		nextPositionMove.SetX(currentItem.PositionLeft().X())
@@ -58,9 +58,14 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 		panic("Exhausted switch")
 	}
 
-	// Check for Wall
+	// Process Wall ahead
 	nextItem, exists := wh.ItemAtPosition(*nextPositionTest)
 	nextItemRight, existsRight := wh.ItemAtPosition(nextPositionTest.Right())
+	if exists && existsRight {
+		if nextItemRight.PositionLeft() == nextItem.PositionLeft() {
+			existsRight = false
+		}
+	}
 	switch direction {
 	case wh1.Left, wh1.Right:
 		if exists && nextItem.Item() == WallItem {
@@ -78,50 +83,28 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 		}
 	}
 
-	if exists && nextItem.Item() == BoxItem {
-		switch direction {
-		case wh1.Left, wh1.Right:
-			wh.Move(nextPositionTest, direction, level)
-		case wh1.Up, wh1.Down:
-			switch currentItem.Item() {
-			case RobotItem:
-				if exists {
-					nextLeft := nextItem.PositionLeft()
-					wh.Move(&nextLeft, direction, level)
-				}
-			case WallItem, BoxItem:
-				step := 1
-				if direction == wh1.Up {
-					step = -1
-				}
-				newLocationLeft := NewLocation(currentItem.PositionLeft().X(), currentItem.PositionLeft().Y()+step)
-				if newItemleft, exists := wh.ItemAtPosition(newLocationLeft); exists && newItemleft.Item() == BoxItem {
-					partLeft := newItemleft.PositionLeft()
-					wh.Move(&partLeft, direction, level)
-				}
-				newLocationRight := NewLocation(currentItem.PositionRight().X(), currentItem.PositionRight().Y()+step)
-				if newItemRight, exists := wh.ItemAtPosition(newLocationRight); exists && newItemRight.Item() == BoxItem {
-					partLeft := newItemRight.PositionLeft()
-					wh.Move(&partLeft, direction, level)
-				}
+	// Process Box ahead
+	if exists && nextItem.Item() == BoxItem && direction.Orientation() == wh1.Horizontal {
+		wh.Move(nextPositionTest, direction, level)
+	}
+
+	if (exists && nextItem.Item() == BoxItem || existsRight && nextItemRight.Item() == BoxItem) && direction.Orientation() == wh1.Vertical {
+		switch currentItem.Item() {
+		case RobotItem:
+			if exists {
+				nextLeft := nextItem.PositionLeft()
+				wh.Move(&nextLeft, direction, level)
+			}
+		case BoxItem:
+			if exists {
+				partLeft := nextItem.PositionLeft()
+				wh.Move(&partLeft, direction, level)
+			}
+			if existsRight {
+				partLeft := nextItemRight.PositionLeft()
+				wh.Move(&partLeft, direction, level)
 			}
 		}
-	} else if existsRight && nextItemRight.Item() == BoxItem {
-		// switch direction {
-		// case wh1.Up, wh1.Down:
-		// 	switch currentItem.Item() {
-		// 	case BoxItem:
-				step := 1
-				if direction == wh1.Up {
-					step = -1
-				}
-				newLocationRight := NewLocation(currentItem.PositionRight().X(), currentItem.PositionRight().Y()+step)
-				if newItemRight, exists := wh.ItemAtPosition(newLocationRight); exists && newItemRight.Item() == BoxItem {
-					partLeft := newItemRight.PositionLeft()
-					wh.Move(&partLeft, direction, level)
-				}
-			// }
-		// }
 	}
 
 	if level == 1 && wh.unwindCause == WallItem {
