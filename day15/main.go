@@ -8,12 +8,18 @@ import (
 
 func main() {
 	data := wh.ReadData("testdata.dat")
-	warehouse := wh.WarehouseFromStr(data)
-	warehouse.GoRobotGo()
-	fmt.Printf("Sum Part1: %d\n", warehouse.SumBoxCoords())
+	// warehouse := wh.WarehouseFromStr(data)
+	// warehouse.GoRobotGo()
+	// fmt.Println(warehouse)
+	// fmt.Printf("Sum Part1: %d\n", warehouse.SumBoxCoords())
 	// Result PArt1: 1463715
 
 	warehouse2 := wh2.WarehouseFromStr(data)
+	// fmt.Println(warehouse2)
+
+	//TODO: At step 3376 a box is dropped!!!
 	warehouse2.GoRobotGo()
-	fmt.Printf("Sum Part2: %d\n", warehouse2.SumBoxCoords())
+	fmt.Println(warehouse2)
+	fmt.Printf("***** Sum Part2: %d\n", warehouse2.SumBoxCoords())
+
 }

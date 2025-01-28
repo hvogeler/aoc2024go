@@ -3,6 +3,7 @@ package warehouse2
 import (
 	"bufio"
 	wh1 "day15/warehouse"
+	"fmt"
 	"strings"
 )
 
@@ -132,9 +133,14 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 }
 
 func (wh *Warehouse) GoRobotGo() {
+    fmt.Println(wh)
 	for i := 0; i < wh.robotPath.Length(); i++ {
 		ptr := wh.robotPath.NextPointer()
 		wh.Move(&wh.robot.position, ptr, 0)
+        if i > 3375 {
+        fmt.Printf("Step %d, Boxes %d, Direction: %s\n", i, len(wh.items), ptr)
+        fmt.Println(wh)
+        }
 	}
 }
 
