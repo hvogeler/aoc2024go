@@ -60,12 +60,17 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 
 	// Process Wall ahead
 	nextItem, exists := wh.ItemAtPosition(*nextPositionTest)
-	nextItemRight, existsRight := wh.ItemAtPosition(nextPositionTest.Right())
-	if exists && existsRight {
-		if nextItemRight.PositionLeft() == nextItem.PositionLeft() {
-			existsRight = false
+	var nextItemRight Item
+	var existsRight bool
+	if currentItem.Item() == BoxItem {
+		nextItemRight, existsRight = wh.ItemAtPosition(nextPositionTest.Right())
+		if exists && existsRight {
+			if nextItemRight.PositionLeft() == nextItem.PositionLeft() {
+				existsRight = false
+			}
 		}
 	}
+
 	switch direction {
 	case wh1.Left, wh1.Right:
 		if exists && nextItem.Item() == WallItem {
