@@ -1,11 +1,8 @@
 package warehouse2
 
-import (
-	wh1 "day15/warehouse"
-)
 
 type Robot struct {
-	position wh1.Location
+	position Location
 }
 
 func (robot Robot) Item() ItemType {
@@ -20,25 +17,25 @@ func (robot Robot) Length() int {
 	return 1
 }
 
-func (robot Robot) PositionLeft() wh1.Location {
+func (robot Robot) PositionLeft() Location {
 	return robot.position
 }
 
-func (robot Robot) PositionRight() wh1.Location {
+func (robot Robot) PositionRight() Location {
 	return robot.position
 }
 
-func (robot Robot) ItemAt(pos wh1.Location) ItemPart {
+func (robot Robot) ItemAt(pos Location) ItemPart {
 	if robot.position == pos {
 		return Left
 	}
 	return None
 }
 
-func (robot *Robot) SetPosition(loc wh1.Location) {
+func (robot *Robot) SetPosition(loc Location) {
     robot.position = loc
 }
 
 func NewRobot(x, y int) Robot {
-	return Robot{position: wh1.NewLocation(x, y)}
+	return Robot{position: NewLocation(x, y)}
 }

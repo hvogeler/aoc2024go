@@ -3,28 +3,36 @@ package warehouse2
 import (
 	"bufio"
 	wh1 "day15/warehouse"
+	"fmt"
 	"strings"
 )
 
+
 type Warehouse struct {
 	robot      Robot
-	items      map[wh1.Location]Item
+	items      map[Location]Item
 	robotPath  wh1.Path
 	dimensions Dimensions
+	undoLog    []UndoItem
+    unwindCause ItemType
 }
 
 func NewWarehouse() Warehouse {
 	wh := new(Warehouse)
-	wh.items = make(map[wh1.Location]Item)
+	wh.items = make(map[Location]Item)
 	return *wh
 }
 
-func (wh *Warehouse) Move(itemAt *wh1.Location, direction wh1.Pointer) {
+func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
+    if level == 0 {
+        wh.ClearUndoLog()
+    }
+    level++;
 	currentItem, curExists := wh.ItemAtPosition(*itemAt)
 	if !curExists {
 		panic("Current Object for Move must exist")
 	}
-	nextPosition := new(wh1.Location)
+	nextPosition := new(Location)
 	switch direction {
 	case wh1.Right:
 		nextPosition.SetX(itemAt.X() + currentItem.Length())
@@ -42,19 +50,22 @@ func (wh *Warehouse) Move(itemAt *wh1.Location, direction wh1.Pointer) {
 		panic("Exhausted switch")
 	}
 
+    // Check for Wall
 	nextItem, exists := wh.ItemAtPosition(*nextPosition)
+    nextItemRight, existsRight := wh.ItemAtPosition(nextPosition.Right())
 	switch direction {
 	case wh1.Left, wh1.Right:
 		if exists && nextItem.Item() == WallItem {
+            wh.unwindCause = WallItem
 			return
 		}
 	case wh1.Up, wh1.Down:
 		if exists && nextItem.Item() == WallItem {
+            wh.unwindCause = WallItem
 			return
 		}
-		nextPositionRight := wh1.NewLocation((*nextPosition).X()+1, (*nextPosition).Y())
-		nextItemRight, exists := wh.ItemAtPosition(nextPositionRight)
-		if exists && nextItemRight.Item() == WallItem {
+		if existsRight && nextItemRight.Item() == WallItem {
+            wh.unwindCause = WallItem
 			return
 		}
 	}
@@ -62,37 +73,44 @@ func (wh *Warehouse) Move(itemAt *wh1.Location, direction wh1.Pointer) {
 	if exists && nextItem.Item() == BoxItem {
 		switch direction {
 		case wh1.Left, wh1.Right:
-			wh.Move(nextPosition, direction)
+			wh.Move(nextPosition, direction, level)
 		case wh1.Up, wh1.Down:
 			switch currentItem.Item() {
 			case RobotItem:
 				nextLeft := nextItem.PositionLeft()
-				wh.Move(&nextLeft, direction)
+				wh.Move(&nextLeft, direction, level)
 			case WallItem, BoxItem:
 				step := 1
 				if direction == wh1.Up {
 					step = -1
 				}
-				newLocationLeft := wh1.NewLocation(currentItem.PositionLeft().X(), currentItem.PositionLeft().Y()+step)
+				newLocationLeft := NewLocation(currentItem.PositionLeft().X(), currentItem.PositionLeft().Y()+step)
 				if newItemleft, exists := wh.ItemAtPosition(newLocationLeft); exists && newItemleft.Item() == BoxItem {
 					partLeft := newItemleft.PositionLeft()
-					wh.Move(&partLeft, direction)
+					wh.Move(&partLeft, direction, level)
 				}
-				newLocationRight := wh1.NewLocation(currentItem.PositionRight().X(), currentItem.PositionRight().Y()+step)
+				newLocationRight := NewLocation(currentItem.PositionRight().X(), currentItem.PositionRight().Y()+step)
 				if newItemRight, exists := wh.ItemAtPosition(newLocationRight); exists && newItemRight.Item() == BoxItem {
 					partLeft := newItemRight.PositionLeft()
-					wh.Move(&partLeft, direction)
+					wh.Move(&partLeft, direction, level)
 				}
 			}
 		}
-
 	}
+
+    if level == 1 && wh.unwindCause == WallItem {
+        fmt.Println("**** Hit a Wall ****", level)
+        fmt.Println(wh.undoLog)
+        wh.Undo()
+        return
+    }
 
 	switch currentItem.Item() {
 	case BoxItem:
 		locationToDelete := currentItem.PositionLeft()
 		currentItem.SetPosition(*nextPosition)
 		wh.items[*nextPosition] = currentItem
+        wh.AddUndoItem(&currentItem, direction)
 		delete(wh.items, locationToDelete)
 		return
 	case RobotItem:
@@ -107,20 +125,44 @@ func (wh *Warehouse) Move(itemAt *wh1.Location, direction wh1.Pointer) {
 func (wh *Warehouse) GoRobotGo() {
 	for i := 0; i < wh.robotPath.Length(); i++ {
 		ptr := wh.robotPath.NextPointer()
-		wh.Move(&wh.robot.position, ptr)
+		wh.Move(&wh.robot.position, ptr, 0)
 	}
 }
 
-func (wh Warehouse) ItemAtPosition(loc wh1.Location) (Item, bool) {
+func (wh *Warehouse) AddUndoItem(item *Item, pointer wh1.Pointer) {
+    wh.undoLog = append(wh.undoLog, UndoItem{item, pointer})
+}
+
+func (wh *Warehouse) ClearUndoLog() {
+    wh.undoLog = wh.undoLog[:0]
+    wh.unwindCause = UnusedItem
+}
+
+func (wh *Warehouse) Undo() {
+    for _, undoItem := range wh.undoLog  {
+        step := 1
+        if undoItem.direction == wh1.Down {
+            step = -1
+        }
+        locationToDelete := (*undoItem.item).PositionLeft()
+        originalPosition := NewLocation(locationToDelete.x, locationToDelete.y + step)
+		(*undoItem.item).SetPosition(originalPosition)
+		wh.items[originalPosition] = *undoItem.item
+		delete(wh.items, locationToDelete)
+        wh.ClearUndoLog()
+    }
+}
+
+func (wh Warehouse) ItemAtPosition(loc Location) (Item, bool) {
 	return wh.ItemAt(loc.X(), loc.Y())
 }
 
 func (wh Warehouse) ItemAt(x, y int) (Item, bool) {
-	item, exists := wh.items[wh1.NewLocation(x, y)]
+	item, exists := wh.items[NewLocation(x, y)]
 	if exists {
 		return item, true
 	}
-	item, exists = wh.items[wh1.NewLocation(x-1, y)]
+	item, exists = wh.items[NewLocation(x-1, y)]
 	if exists && item.Length() == 2 {
 		return item, true
 	}
@@ -147,13 +189,13 @@ WarehouseLoop:
 			switch rne {
 			case WallRune:
 				wall := NewWall(xOut, y)
-				wh.items[wh1.NewLocation(xOut, y)] = &wall
+				wh.items[NewLocation(xOut, y)] = &wall
 			case BoxRune:
 				box := NewBox(xOut, y)
-				wh.items[wh1.NewLocation(xOut, y)] = &box
+				wh.items[NewLocation(xOut, y)] = &box
 			case RobotRune:
 				wh.robot = NewRobot(xOut, y)
-				wh.items[wh1.NewLocation(xOut, y)] = &wh.robot
+				wh.items[NewLocation(xOut, y)] = &wh.robot
 			case UnusedRune:
 			default:
 				panic("Exhausted Switch")
