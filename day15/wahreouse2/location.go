@@ -39,6 +39,18 @@ func (loc Location) Right() Location {
 	return NewLocation(loc.x+1, loc.y)
 }
 
+func (loc Location) Left() Location {
+	return NewLocation(loc.x-1, loc.y)
+}
+
+func (loc Location) Down() Location {
+	return NewLocation(loc.x, loc.y+1)
+}
+
+func (loc Location) Up() Location {
+	return NewLocation(loc.x, loc.y-1)
+}
+
 func (loca Location) Compare(locb Location) int {
 	if loca == locb {
 		return 0

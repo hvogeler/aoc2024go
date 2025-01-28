@@ -3,7 +3,6 @@ package warehouse2
 import (
 	"bufio"
 	wh1 "day15/warehouse"
-	"fmt"
 	"strings"
 )
 
@@ -31,35 +30,30 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 	if !curExists {
 		panic("Current Object for Move must exist")
 	}
-	nextPositionMove := new(Location)
-	nextPositionTest := new(Location)
+	var nextPositionMove Location
+	var nextPositionTest Location
 	switch direction {
 	case wh1.Right:
-		nextPositionMove.SetX(currentItem.PositionLeft().X() + 1)
-		nextPositionMove.SetY(currentItem.PositionLeft().Y())
+		nextPositionMove = currentItem.PositionLeft().Right()
+		// if a box is moved to the right, the next item following the box
+		// is len(box) steps away
 		nextPositionTest.SetX(currentItem.PositionLeft().X() + currentItem.Length())
 		nextPositionTest.SetY(currentItem.PositionLeft().Y())
 	case wh1.Left:
-		nextPositionMove.SetX(currentItem.PositionLeft().X() - 1)
-		nextPositionMove.SetY(currentItem.PositionLeft().Y())
-		nextPositionTest.SetX(currentItem.PositionLeft().X() - 1) //currentItem.Length())
-		nextPositionTest.SetY(currentItem.PositionLeft().Y())
+		nextPositionMove = currentItem.PositionLeft().Left()
+		nextPositionTest = currentItem.PositionLeft().Left()
 	case wh1.Up:
-		nextPositionMove.SetX(currentItem.PositionLeft().X())
-		nextPositionMove.SetY(currentItem.PositionLeft().Y() - 1)
-		nextPositionTest.SetX(currentItem.PositionLeft().X())
-		nextPositionTest.SetY(currentItem.PositionLeft().Y() - 1)
+		nextPositionMove = currentItem.PositionLeft().Up()
+		nextPositionTest = currentItem.PositionLeft().Up()
 	case wh1.Down:
-		nextPositionMove.SetX(currentItem.PositionLeft().X())
-		nextPositionMove.SetY(currentItem.PositionLeft().Y() + 1)
-		nextPositionTest.SetX(currentItem.PositionLeft().X())
-		nextPositionTest.SetY(currentItem.PositionLeft().Y() + 1)
+		nextPositionMove = currentItem.PositionLeft().Down()
+		nextPositionTest = currentItem.PositionLeft().Down()
 	default:
 		panic("Exhausted switch")
 	}
 
 	// Process Wall ahead
-	nextItem, exists := wh.ItemAtPosition(*nextPositionTest)
+	nextItem, exists := wh.ItemAtPosition(nextPositionTest)
 	var nextItemRight Item
 	var existsRight bool
 	if currentItem.Item() == BoxItem {
@@ -90,7 +84,7 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 
 	// Process Box ahead
 	if exists && nextItem.Item() == BoxItem && direction.Orientation() == wh1.Horizontal {
-		wh.Move(nextPositionTest, direction, level)
+		wh.Move(&nextPositionTest, direction, level)
 	}
 
 	if (exists && nextItem.Item() == BoxItem || existsRight && nextItemRight.Item() == BoxItem) && direction.Orientation() == wh1.Vertical {
@@ -101,6 +95,7 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 				wh.Move(&nextLeft, direction, level)
 			}
 		case BoxItem:
+			// If box is moved vertically, check if next boxes are half touched
 			if exists {
 				partLeft := nextItem.PositionLeft()
 				wh.Move(&partLeft, direction, level)
@@ -113,8 +108,6 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 	}
 
 	if level == 1 && wh.unwindCause == WallItem {
-		fmt.Println("**** Hit a Wall ****", level)
-		fmt.Println(wh.undoLog)
 		wh.Undo()
 		return
 	}
@@ -123,15 +116,15 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 		switch currentItem.Item() {
 		case BoxItem:
 			locationToDelete := currentItem.PositionLeft()
-			currentItem.SetPosition(*nextPositionMove)
-			wh.items[*nextPositionMove] = currentItem
+			currentItem.SetPosition(nextPositionMove)
+			wh.items[nextPositionMove] = currentItem
 			wh.AddUndoItem(&currentItem, direction)
 			delete(wh.items, locationToDelete)
 			return
 		case RobotItem:
 			locationToDelete := wh.robot.PositionLeft()
-			wh.robot.position = *nextPositionMove
-			wh.items[*nextPositionMove] = &wh.robot
+			wh.robot.position = nextPositionMove
+			wh.items[nextPositionMove] = &wh.robot
 			delete(wh.items, locationToDelete)
 			return
 		}

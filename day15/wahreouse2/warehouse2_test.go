@@ -72,4 +72,14 @@ func Test_FromString3(t *testing.T) {
 			t.Errorf("Espected Sum 9021, got %d", wh.SumBoxCoords())
 		}
 	})
+
+	t.Run("Example Data gogo", func(t *testing.T) {
+		data := wh1.ReadData("../example.dat")
+		wh := WarehouseFromStr(data)
+		fmt.Println(wh)
+        wh.GoRobotGo()
+		if wh.SumBoxCoords() != 9021 {
+			t.Errorf("Espected Sum 9021, got %d", wh.SumBoxCoords())
+		}
+	})
 }
