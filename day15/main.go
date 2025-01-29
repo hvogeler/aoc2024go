@@ -19,7 +19,7 @@ func main() {
 
 	//TODO: At step 3376 a box is dropped!!!
 	warehouse2.GoRobotGo()
-	fmt.Println(warehouse2)
+	// fmt.Println(warehouse2)
 	fmt.Printf("***** Sum Part2: %d\n", warehouse2.SumBoxCoords())
 
 }

@@ -133,14 +133,26 @@ func (wh *Warehouse) Move(itemAt *Location, direction wh1.Pointer, level int) {
 }
 
 func (wh *Warehouse) GoRobotGo() {
-    fmt.Println(wh)
+	fmt.Println(wh)
+
+	initialBoxCount := 0
 	for i := 0; i < wh.robotPath.Length(); i++ {
+		if initialBoxCount == 0 {
+			initialBoxCount, _ = wh.CountObjects()
+		}
 		ptr := wh.robotPath.NextPointer()
+		oldWarehouse := fmt.Sprintln(wh)
 		wh.Move(&wh.robot.position, ptr, 0)
-        if i > 3375 {
-        fmt.Printf("Step %d, Boxes %d, Direction: %s\n", i, len(wh.items), ptr)
-        fmt.Println(wh)
-        }
+		boxCount, _ := wh.CountObjects()
+		if initialBoxCount != boxCount {
+			fmt.Printf("Warehouse at step %d had %d boxes\n", i-1, initialBoxCount)
+            fmt.Println(oldWarehouse)
+			fmt.Printf("Warehouse at step %d has %d boxes\n", i,boxCount)
+            fmt.Println(wh)
+			fmt.Printf("Step %d, Boxes initially: %d, now: %d, Direction: %s, Robot: %s\n", i, initialBoxCount, boxCount, ptr, wh.robot.position)
+			panic("Number of boxes must not change")
+			// fmt.Println(wh)
+		}
 	}
 }
 
@@ -198,6 +210,20 @@ func (wh Warehouse) ItemAt(x, y int) (Item, bool) {
 	return nil, false
 }
 
+func (wh Warehouse) CountObjects() (int, int) {
+	boxCount := 0
+	wallCount := 0
+	for _, v := range wh.items {
+		if v.Item() == WallItem {
+			wallCount++
+		}
+		if v.Item() == BoxItem {
+			boxCount++
+		}
+	}
+	return boxCount, wallCount
+}
+
 func WarehouseFromStr(s string) Warehouse {
 	wh := NewWarehouse()
 	scanner := bufio.NewScanner(strings.NewReader(s))
@@ -248,6 +274,7 @@ WarehouseLoop:
 func (wh Warehouse) String() string {
 	var builder strings.Builder
 	for y := 0; y < wh.dimensions.y; y++ {
+        builder.WriteString(fmt.Sprintf("%4d. ", y))
 		for x := 0; x < wh.dimensions.x; {
 			itemPtr, exists := wh.ItemAt(x, y)
 			if exists {
