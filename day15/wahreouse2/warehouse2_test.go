@@ -56,6 +56,21 @@ func Test_FromString2(t *testing.T) {
 
 }
 
+func Test_DroppingBoxes(t *testing.T) {
+
+	t.Run("Example Data 3", func(t *testing.T) {
+		data := wh1.ReadData("../example3.dat")
+		wh := WarehouseFromStr(data)
+		fmt.Println(wh)
+		for i := 0; i < wh.robotPath.Length(); i++ {
+			ptr := wh.robotPath.NextPointer()
+            fmt.Printf("\n%d. %s\n", i, ptr)
+			wh.Move(&wh.robot.position, ptr, 0)
+			fmt.Println(wh)
+		}
+	})
+}
+
 func Test_FromString3(t *testing.T) {
 
 	t.Run("Example Data", func(t *testing.T) {

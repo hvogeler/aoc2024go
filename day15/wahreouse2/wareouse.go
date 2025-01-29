@@ -4,6 +4,7 @@ import (
 	"bufio"
 	wh1 "day15/warehouse"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -177,6 +178,8 @@ func (wh *Warehouse) ClearUndoLog() {
 }
 
 func (wh *Warehouse) Undo() {
+    // make it a FIFO by reversing the elements
+    slices.Reverse(wh.undoLog)
 	for _, undoItem := range wh.undoLog {
 		step := 1
 		if undoItem.direction == wh1.Down || undoItem.direction == wh1.Right {
