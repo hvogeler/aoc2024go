@@ -52,7 +52,7 @@ func Test_Move(t *testing.T) {
 			fmt.Println(maze)
 		}
 		if maze.lowScore != 11048 {
-			t.Errorf("Expected low score 7036, got %d", maze.lowScore)
+			t.Errorf("Expected low score 11048, got %d", maze.lowScore)
 		}
 	})
 }
