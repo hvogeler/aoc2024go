@@ -26,6 +26,7 @@ func Test_Move(t *testing.T) {
 		}
 
 	})
+
 	t.Run("Move2", func(t *testing.T) {
 		data := ReadData("../example2.dat")
 		// fmt.Println(data)
@@ -35,7 +36,22 @@ func Test_Move(t *testing.T) {
 			maze.MoveReindeer()
 			fmt.Println(maze)
 		}
-		if maze.lowScore != 7036 {
+		if maze.lowScore != 11048 {
+			t.Errorf("Expected low score 7036, got %d", maze.lowScore)
+		}
+	})
+	
+	t.Run("testdata", func(t *testing.T) {
+		data := ReadData("../testdata.dat")
+		// fmt.Println(data)
+		maze := MazeFromStr(data)
+		fmt.Println(maze)
+		i := 0
+		for i = 0; maze.CountAlive() > 0; i++ {
+			maze.MoveReindeer()
+			fmt.Println(maze)
+		}
+		if maze.lowScore != 11048 {
 			t.Errorf("Expected low score 7036, got %d", maze.lowScore)
 		}
 	})

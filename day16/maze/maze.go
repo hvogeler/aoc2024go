@@ -35,7 +35,7 @@ func (m *Maze) MoveReindeer() {
                 m.lowScore = r.score
             }
             r.Kill()
-            fmt.Printf("Reindeer %s killed because reached End\n", reindeer)
+            fmt.Printf("Reindeer %s killed because reached End\n", r)
 		case UnusedType:
 			r.score++
 			r.position = nextTilePos
@@ -167,6 +167,11 @@ func (m Maze) NeighborTile(pos Position, heading HeadingType) (*Tile, Position) 
 func (m Maze) IsDeadEnd(pos Position, currentHeading HeadingType) bool {
 	wallCount := 0
 	nTileCurrentHeadingIsWall := false
+    nTileOppositeHeadingIsWall := false
+    oppTile, _ := m.NeighborTile(pos, currentHeading.OppositeHeading())
+    if (*oppTile).TileType() == WallType {
+        nTileOppositeHeadingIsWall = true
+    }
 	for _, heading := range HeadingTypes() {
 		nTile, _ := m.NeighborTile(pos, heading)
 		if (*nTile).TileType() == WallType {
@@ -177,7 +182,7 @@ func (m Maze) IsDeadEnd(pos Position, currentHeading HeadingType) bool {
 		}
 	}
 
-	return wallCount == 3 && nTileCurrentHeadingIsWall
+	return wallCount == 3 && nTileCurrentHeadingIsWall && !nTileOppositeHeadingIsWall
 }
 
 func (m Maze) Tile(row, col int) *Tile {

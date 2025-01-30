@@ -13,6 +13,21 @@ func HeadingTypes() []HeadingType {
 	return []HeadingType{Up, Down, Left, Right}
 }
 
+func (h HeadingType) OppositeHeading() HeadingType {
+	switch h {
+	case Up:
+		return Down
+	case Down:
+		return Up
+	case Left:
+		return Right
+	case Right:
+		return Left
+	default:
+		panic("exhausted switch")
+	}
+}
+
 func (dt HeadingType) Score(newDt HeadingType) int {
 	switch dt.TurnRate(newDt) {
 	case 0:
