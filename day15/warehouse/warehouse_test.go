@@ -9,7 +9,7 @@ func Test_FromString2(t *testing.T) {
 	t.Run("Example Data", func(t *testing.T) {
 		data := ReadData("../example.dat")
 		// fmt.Println(data)
-		wh := WarehouseFromStr2(data)
+		wh := WarehouseFromStr(data)
 		fmt.Println(wh)
 	})
 }
