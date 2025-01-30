@@ -62,5 +62,5 @@ const (
 	UnusedType TileType = "."
 	StartType  TileType = "S"
 	FinishType TileType = "E"
-	TrackType  TileType = "T"
+	TrackMarkType  TileType = "T"
 )
