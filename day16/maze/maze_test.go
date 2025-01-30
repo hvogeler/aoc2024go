@@ -5,11 +5,38 @@ import (
 	"testing"
 )
 
-func Test_FromString2(t *testing.T) {
+func Test_FromString(t *testing.T) {
 	t.Run("Example Data1", func(t *testing.T) {
 		data := ReadData("../example1.dat")
 		fmt.Println(data)
 		maze := MazeFromStr(data)
 		fmt.Println(maze)
+	})
+}
+
+func Test_Move(t *testing.T) {
+	t.Run("Move1", func(t *testing.T) {
+		data := ReadData("../example1.dat")
+		// fmt.Println(data)
+		maze := MazeFromStr(data)
+		fmt.Println(maze)
+		for i := 0; maze.CountAlive() > 0; i++ {
+			maze.MoveReindeer()
+			fmt.Println(maze)
+		}
+
+	})
+	t.Run("Move2", func(t *testing.T) {
+		data := ReadData("../example2.dat")
+		// fmt.Println(data)
+		maze := MazeFromStr(data)
+		fmt.Println(maze)
+		for i := 0; maze.CountAlive() > 0; i++ {
+			maze.MoveReindeer()
+			fmt.Println(maze)
+		}
+		if maze.lowScore != 7036 {
+			t.Errorf("Expected low score 7036, got %d", maze.lowScore)
+		}
 	})
 }
