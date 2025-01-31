@@ -17,28 +17,26 @@ type Maze struct {
 
 func (m *Maze) MoveReindeer() {
 	for i, reindeer := range m.reindeers {
-		if reindeer.state == dead {
+		if !reindeer.IsAlive() {
 			continue
 		}
 		r := &m.reindeers[i]
-        if reindeer.score >= m.lowScore {
-            r.Kill()
-            fmt.Printf("Reindeer %s killed because above lowscore\n", reindeer)
-            continue
-        }
-		nextTile, nextTilePos := m.NeighborTile(reindeer.position, reindeer.heading)
+		if reindeer.score >= m.lowScore {
+			r.Kill("Current low score exceeded")
+			continue
+		}
+		nextTile, nextTilePos := m.NeighborTile(reindeer.Position(), reindeer.heading)
 		switch (*nextTile).TileType() {
-        case FinishType:
-            r.score++
-			r.position = nextTilePos
-            if r.score < m.lowScore {
-                m.lowScore = r.score
-            }
-            r.Kill()
-            fmt.Printf("Reindeer %s killed because reached End\n", r)
+		case FinishType:
+			r.score++
+			r.SetPosition(nextTilePos)
+			if r.score < m.lowScore {
+				m.lowScore = r.score
+			}
+			r.Kill("End of maze reached")
 		case UnusedType:
 			r.score++
-			r.position = nextTilePos
+			r.SetPosition(nextTilePos)
 			*nextTile = TrackMark{
 				reindeerId: r.id,
 				heading:    r.heading,
@@ -47,28 +45,31 @@ func (m *Maze) MoveReindeer() {
 		case TrackMarkType:
 			tm := (*nextTile).(TrackMark)
 			if tm.heading.TurnRate(reindeer.heading) == 0 {
+                if r.AlreadyVisited(nextTilePos) {
+                    r.Kill("Running in a loop")
+                }
 				r.score++
 				if r.score < tm.score {
-					r.position = nextTilePos
+					r.SetPosition(nextTilePos)
 					tm.reindeerId = r.id
 					tm.score = r.score
 					tm.heading = r.heading
 					m.tiles[nextTilePos.row][nextTilePos.col] = tm
 				} else {
-					r.state = dead
+					r.Kill("Current Reindeer score exceeds latest score on that tile")
 				}
 			}
 			if tm.heading.TurnRate(reindeer.heading) == 180 {
-				r.state = dead
+				r.Kill("Reversing Heading")
 			}
 			if tm.heading.TurnRate(reindeer.heading) == 90 {
 				r.score++
-				r.position = nextTilePos
+				r.SetPosition(nextTilePos)
 			}
 			// case WallType:
 			// 	m.CloneReindeer(&m.reindeers[i])
 		}
-		if m.reindeers[i].state == alive {
+		if m.reindeers[i].IsAlive() {
 			m.CloneReindeer(&m.reindeers[i])
 		}
 
@@ -76,13 +77,13 @@ func (m *Maze) MoveReindeer() {
 }
 
 // Return number of cloned reindeers. 0 means dead end. 1 means just a turn
-func (m *Maze) CloneReindeer(r *Reindeer) int {
-	if m.IsDeadEnd(r.position, r.heading) {
-		r.Kill()
+func (m *Maze) CloneReindeer(r1 *Reindeer) int {
+	if m.IsDeadEnd(r1.Position(), r1.heading) {
+		r1.Kill("Dead end: TODO check if this test can/must be removed")
 		return 0
 	}
-	pos := r.position
-	currentHeading := r.heading
+	pos := r1.Position()
+	currentHeading := r1.heading
 	thisTile := m.Tile(pos.Coords())
 	neighborTileCurrentHeading, _ := (*m).NeighborTile(pos, currentHeading)
 	cloneCount := 0
@@ -91,35 +92,30 @@ func (m *Maze) CloneReindeer(r *Reindeer) int {
 			neighborTile, _ := (*m).NeighborTile(pos, newHeading)
 			if (*neighborTile).TileType() != WallType {
 				if (*neighborTileCurrentHeading).TileType() == WallType {
-					r.state = dead
+					r1.Kill("Wall straight ahead. Kill this Reindeer and send a clone in the new heading(s)")
 					// continue
 				}
 				if newHeading.TurnRate(currentHeading) == 180 {
 					continue
 				}
 				score := currentHeading.Score(newHeading)
-				r := Reindeer{
-					id:       m.NextReindeerId(),
-					heading:  newHeading,
-					position: pos,
-					score:    score + r.score,
+				rClone := r1.Clone(m.NextReindeerId(), newHeading, score)
+				if _, exists := m.ReindeerById(rClone.id); exists {
+					panic(fmt.Sprintf("Duplicate Reindeer ID: %d", rClone.id))
 				}
-				if _, exists := m.ReindeerById(r.id); exists {
-					panic(fmt.Sprintf("Duplicate Reindeer ID: %d", r.id))
-				}
-				m.reindeers = append(m.reindeers, r)
+				m.reindeers = append(m.reindeers, rClone)
 				cloneCount++
 				switch (*thisTile).TileType() {
 				case UnusedType:
 					*thisTile = TrackMark{
-						reindeerId: r.id,
+						reindeerId: rClone.id,
 						heading:    newHeading,
 						score:      score,
 					}
 				case TrackMarkType:
 					tm, _ := (*thisTile).(TrackMark)
 					*thisTile = TrackMark{
-						reindeerId: r.id,
+						reindeerId: rClone.id,
 						heading:    newHeading,
 						score:      tm.score + score,
 					}
@@ -131,13 +127,13 @@ func (m *Maze) CloneReindeer(r *Reindeer) int {
 }
 
 func (m Maze) CountAlive() int {
-    sum := 0
-    for _, r := range m.reindeers {
-        if r.state == alive {
-            sum++
-        }
-    }
-    return sum
+	sum := 0
+	for _, r := range m.reindeers {
+		if r.IsAlive() {
+			sum++
+		}
+	}
+	return sum
 }
 
 func (m *Maze) NextReindeerId() int {
@@ -167,11 +163,11 @@ func (m Maze) NeighborTile(pos Position, heading HeadingType) (*Tile, Position) 
 func (m Maze) IsDeadEnd(pos Position, currentHeading HeadingType) bool {
 	wallCount := 0
 	nTileCurrentHeadingIsWall := false
-    nTileOppositeHeadingIsWall := false
-    oppTile, _ := m.NeighborTile(pos, currentHeading.OppositeHeading())
-    if (*oppTile).TileType() == WallType {
-        nTileOppositeHeadingIsWall = true
-    }
+	nTileOppositeHeadingIsWall := false
+	oppTile, _ := m.NeighborTile(pos, currentHeading.OppositeHeading())
+	if (*oppTile).TileType() == WallType {
+		nTileOppositeHeadingIsWall = true
+	}
 	for _, heading := range HeadingTypes() {
 		nTile, _ := m.NeighborTile(pos, heading)
 		if (*nTile).TileType() == WallType {
@@ -205,7 +201,7 @@ func (m Maze) String() string {
 	}
 	s.WriteString(fmt.Sprintf("      0 - %d columns\n", colno))
 	for _, r := range m.reindeers {
-		if r.state == alive {
+		if r.IsAlive() {
 			s.WriteString(r.String())
 		}
 	}
@@ -257,10 +253,7 @@ func MazeFromStr(s string) Maze {
 		dimensions: Dimensions{
 			rows: rowno + 1,
 			cols: cols}}
-	firstReindeer := Reindeer{
-		id:       newMaze.NextReindeerId(),
-		position: firstReeindeerPosition,
-		heading:  Right}
+	firstReindeer := NewReindeer(newMaze.NextReindeerId(), firstReeindeerPosition)
 	newMaze.reindeers = append(newMaze.reindeers, firstReindeer)
 	newMaze.CloneReindeer(&newMaze.reindeers[0])
 	return newMaze
