@@ -24,7 +24,9 @@ func Test_Move(t *testing.T) {
 			maze.MoveReindeer()
 			fmt.Println(maze)
 		}
-
+		if maze.lowScore != 7036 {
+			t.Errorf("Expected low score 7036, got %d", maze.lowScore)
+		}
 	})
 
 	t.Run("Move2", func(t *testing.T) {
@@ -37,7 +39,7 @@ func Test_Move(t *testing.T) {
 			fmt.Println(maze)
 		}
 		if maze.lowScore != 11048 {
-			t.Errorf("Expected low score 7036, got %d", maze.lowScore)
+			t.Errorf("Expected low score 11048, got %d", maze.lowScore)
 		}
 	})
 	
@@ -51,6 +53,8 @@ func Test_Move(t *testing.T) {
 			maze.MoveReindeer()
 			fmt.Println(maze)
 		}
+        fmt.Printf("Reindeer cloned: %d\n", len(maze.reindeers))
+        // 153516 is too high
 		if maze.lowScore != 11048 {
 			t.Errorf("Expected low score 11048, got %d", maze.lowScore)
 		}
