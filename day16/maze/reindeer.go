@@ -45,7 +45,7 @@ func (r Reindeer) String() string {
 	if r.state == alive {
 		prefix = "Alive"
 	}
-	s := fmt.Sprintf("%s Reeindeer %d at %s heading %s has score of %d\n", prefix, r.id, r.Position(), r.heading, r.score)
+	s := fmt.Sprintf("%s Reindeer %d at %s heading %s has score of %d, tracklen(%d)\n", prefix, r.id, r.Position(), r.heading, r.score, len(r.visited))
 	return s
 }
 
@@ -53,7 +53,7 @@ func (r Reindeer) Clone(newId int, newHeading HeadingType, score int) Reindeer {
 	newReindeer := Reindeer{
 		id:      newId,
 		heading: newHeading,
-		score:   score + r.score,
+		score:   score,
 	}
 	visited := make([]Position, len(r.visited))
 	// for _, v := range r.visited {
