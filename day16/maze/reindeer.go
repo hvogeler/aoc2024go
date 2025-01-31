@@ -5,10 +5,10 @@ import "fmt"
 type Reindeer struct {
 	id      int
 	heading HeadingType
-	// position Position
 	score   int
 	state   ReindeerState
 	visited []Position
+	reachedEnd bool
 }
 
 func NewReindeer(id int, position Position) Reindeer {
@@ -56,19 +56,14 @@ func (r Reindeer) Clone(newId int, newHeading HeadingType, score int) Reindeer {
 		score:   score,
 	}
 	newReindeer.visited = make([]Position, len(r.visited))
-	// for i, v := range r.visited {
-	// 	visited[i] = v
-	// }
 	copy(newReindeer.visited, r.visited)
-	// visited = append(visited, r.visited...)
-	// newReindeer.visited = visited
 	return newReindeer
 }
 
 func (r *Reindeer) Kill(reason string) {
 	r.state = dead
-	if reason != "" {
-		fmt.Printf("Reindeer %d killed: %s\n", r.id, reason)
+	if reason[:3] == "End" {
+		fmt.Printf("Reindeer %d killed: %s, Score %d\n", r.id, reason, r.score)
 	}
 }
 

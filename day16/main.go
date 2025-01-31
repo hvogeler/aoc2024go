@@ -21,5 +21,5 @@ func main() {
 		// }
 	}
 	fmt.Println(maze)
-
+	// 149556
 }

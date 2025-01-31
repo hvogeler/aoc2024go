@@ -29,10 +29,11 @@ func (m *Maze) MoveReindeer() {
 			if r.score < m.lowScore {
 				m.lowScore = r.score
 			}
+			r.reachedEnd = true
 			r.Kill("End of maze reached")
 		case WallType:
 			m.CloneReindeer(&m.reindeers[i])
-        case UnusedType:
+		case UnusedType:
 			r.SetPosition(nextTilePos)
 			r.score++
 			*nextTile = TrackMark{
@@ -41,38 +42,33 @@ func (m *Maze) MoveReindeer() {
 				score:      r.score,
 			}
 			m.CloneReindeer(&m.reindeers[i])
-        case TrackMarkType:
-			if r.AlreadyVisited(nextTilePos) {
-				r.Kill("Running in a loop")
+		case TrackMarkType:
+			tm := (*nextTile).(TrackMark)
+			if r.heading == tm.heading {
+				if r.AlreadyVisited(nextTilePos) {
+					r.Kill("Running in a loop")
+					continue
+				}
 			}
 			r.SetPosition(nextTilePos)
 			r.score++
-            tm := (*nextTile).(TrackMark)
-            if tm.heading == r.heading {
-				// if r.score < tm.score {
+			if tm.heading == r.heading {
+				if r.score < tm.score {
 					r.SetPosition(nextTilePos)
 					tm.reindeerId = r.id
 					tm.score = r.score
 					tm.heading = r.heading
 					m.tiles[nextTilePos.row][nextTilePos.col] = tm
-				// } else {
-				// 	r.Kill("Current Reindeer score exceeds latest score on that tile")
-				// }
-
-            }
-        default:
-            panic("Exhauted switch")
+				} else {
+					r.Kill("Current Reindeer score exceeds latest score on that tile")
+				}
+			}
+		case StartType:
+			r.Kill("Back to Start")
+		default:
+			panic("Exhauted switch")
 		}
 	}
-	// zw := make([]Reindeer, m.CountAlive())
-    // var i int
-	// for _, r := range m.reindeers {
-	// 	if r.IsAlive() {
-	// 		zw[i] = r
-    //         i++
-	// 	}
-	// }
-    fmt.Printf("len(reinderrs): %d\n", len(m.reindeers))
 }
 
 // Return number of cloned reindeers. 0 means dead end. 1 means just a turn
@@ -123,9 +119,9 @@ func (m *Maze) CloneReindeer(r *Reindeer) {
 			}
 		}
 	}
-	// if cloneCount == 0 {
-	// 	r.Kill("Dead End")
-	// }
+	if cloneCount == 0 {
+		r.Kill("Dead End")
+	}
 }
 
 func (m Maze) CountAlive() int {
@@ -206,6 +202,49 @@ func (m Maze) String() string {
 		if r.IsAlive() {
 			s.WriteString(r.String())
 		}
+	}
+	s.WriteString(fmt.Sprintf("Low Score is %d\n", m.lowScore))
+	return s.String()
+}
+
+func (m Maze) PrintCheapestTrack() string {
+	minId := 0
+	minScore := math.MaxInt
+	for _, r := range m.reindeers {
+		if r.reachedEnd && r.score < minScore {
+			minId = r.id
+			minScore = r.score
+		}
+	}
+	return m.PrintTrack(minId)
+}
+
+func (m Maze) PrintTrack(reindeerId int) string {
+	var s strings.Builder
+	var colno int
+	var tile Tile
+	r, exists := m.ReindeerById(reindeerId)
+	if !exists {
+		panic("reinder does not exist")
+	}
+	for rowno, row := range m.tiles {
+		s.WriteString(fmt.Sprintf("%4d. ", rowno))
+		for colno, tile = range row {
+			if r.AlreadyVisited(NewPosition(rowno, colno)) {
+				if tile.TileType() == FinishType {
+					s.WriteString("E")
+				} else {
+					s.WriteString("o")
+				}
+			} else {
+				if tile.TileType() == TrackMarkType {
+					s.WriteString(".")
+				} else {
+					s.WriteString(fmt.Sprint(tile))
+				}
+			}
+		}
+		s.WriteString(fmt.Sprintln())
 	}
 	s.WriteString(fmt.Sprintf("Low Score is %d\n", m.lowScore))
 	return s.String()
