@@ -55,12 +55,13 @@ func (r Reindeer) Clone(newId int, newHeading HeadingType, score int) Reindeer {
 		heading: newHeading,
 		score:   score,
 	}
-	visited := make([]Position, len(r.visited))
-	// for _, v := range r.visited {
-	// 	visited = append(visited, v)
+	newReindeer.visited = make([]Position, len(r.visited))
+	// for i, v := range r.visited {
+	// 	visited[i] = v
 	// }
-	visited = append(visited, r.visited...)
-	newReindeer.visited = visited
+	copy(newReindeer.visited, r.visited)
+	// visited = append(visited, r.visited...)
+	// newReindeer.visited = visited
 	return newReindeer
 }
 

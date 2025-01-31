@@ -49,15 +49,15 @@ func (m *Maze) MoveReindeer() {
 			r.score++
             tm := (*nextTile).(TrackMark)
             if tm.heading == r.heading {
-				if r.score < tm.score {
+				// if r.score < tm.score {
 					r.SetPosition(nextTilePos)
 					tm.reindeerId = r.id
 					tm.score = r.score
 					tm.heading = r.heading
 					m.tiles[nextTilePos.row][nextTilePos.col] = tm
-				} else {
-					r.Kill("Current Reindeer score exceeds latest score on that tile")
-				}
+				// } else {
+				// 	r.Kill("Current Reindeer score exceeds latest score on that tile")
+				// }
 
             }
         default:
@@ -76,10 +76,10 @@ func (m *Maze) MoveReindeer() {
 }
 
 // Return number of cloned reindeers. 0 means dead end. 1 means just a turn
-func (m *Maze) CloneReindeer(r1 *Reindeer) {
-	pos := r1.Position()
-	currentHeading := r1.heading
-	currentScore := r1.score
+func (m *Maze) CloneReindeer(r *Reindeer) {
+	pos := r.Position()
+	currentHeading := r.heading
+	currentScore := r.score
 	thisTile := m.Tile(pos.Coords())
 	cloneCount := 0
 	for _, newHeading := range HeadingTypes() {
@@ -95,11 +95,11 @@ func (m *Maze) CloneReindeer(r1 *Reindeer) {
 
 			var rClone Reindeer
 			if cloneCount == 0 {
-				r1.heading = newHeading
-				r1.score += score
-				rClone = *r1
+				r.heading = newHeading
+				r.score += score
+				rClone = *r
 			} else {
-				rClone = r1.Clone(m.NextReindeerId(), newHeading, currentScore+score)
+				rClone = r.Clone(m.NextReindeerId(), newHeading, currentScore+score)
 				if _, exists := m.ReindeerById(rClone.id); exists {
 					panic(fmt.Sprintf("Duplicate Reindeer ID: %d", rClone.id))
 				}
@@ -123,9 +123,9 @@ func (m *Maze) CloneReindeer(r1 *Reindeer) {
 			}
 		}
 	}
-	if cloneCount == 0 {
-		r1.Kill("Dead End")
-	}
+	// if cloneCount == 0 {
+	// 	r.Kill("Dead End")
+	// }
 }
 
 func (m Maze) CountAlive() int {
