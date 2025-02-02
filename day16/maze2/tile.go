@@ -6,10 +6,10 @@ type TileType string
 
 const (
 	// Unused TileType = "."
-	Start  TileType = "S"
-	Finish TileType = "E"
-	Node   TileType = "."
-	Wall   TileType = "#"
+	StartType  TileType = "S"
+	FinishType TileType = "E"
+	NodeType   TileType = "."
+	WallType   TileType = "#"
 )
 
 type Heading string
@@ -22,33 +22,77 @@ const (
 	Undefined Heading = "."
 )
 
+func Headings() []Heading {
+	return []Heading{North, East, South, West}
+}
+
+func (srcHeading Heading) Cost(tgtHeading Heading) int {
+	if (srcHeading == North || srcHeading == South) &&
+		(tgtHeading == East || tgtHeading == West) {
+		return 1001
+	}
+	if (srcHeading == East || srcHeading == West) &&
+		(tgtHeading == North || tgtHeading == South) {
+		return 1001
+	}
+	if srcHeading.IsOpposite(tgtHeading) {
+		return 2001
+	}
+	return 1
+}
+
+func (srcHeading Heading) IsOpposite(tgtHeading Heading) bool {
+	return (srcHeading == North && tgtHeading == South) ||
+		(srcHeading == East && tgtHeading == West) ||
+		(srcHeading == South && tgtHeading == North) ||
+		(srcHeading == West && tgtHeading == East)
+}
+
+type NodeSubType int
+
+const (
+	Intermediate NodeSubType = iota
+	Start
+	Finish
+)
+
 type Tile interface {
 	TileType() TileType
 	String() string
 }
 
 type NodeTile struct {
+	nodeType   NodeSubType
 	cost       int
 	isExplored bool
 	pos        Position
 	heading    Heading
-	preTile    *Tile
+	preTile    *NodeTile
 }
 
 func (n NodeTile) TileType() TileType {
-	return Node
+	return NodeType
 }
 
 func (n NodeTile) String() string {
-	return string(n.heading)
+	switch n.nodeType {
+	case Intermediate:
+		return string(n.heading)
+	case Start:
+		return string(StartType)
+	case Finish:
+		return string(FinishType)
+	default:
+		panic("Switch exhausted")
+	}
 }
 
 func (n NodeTile) Heading() Heading {
 	return n.heading
 }
 
-func NewNodeTile(row int, col int) NodeTile {
-	return NodeTile{
+func NewNodeTile(row int, col int) *NodeTile {
+	return &NodeTile{
 		cost:       math.MaxInt,
 		isExplored: false,
 		heading:    Undefined,
@@ -61,43 +105,43 @@ type WallTile struct {
 }
 
 func (w WallTile) TileType() TileType {
-	return Wall
+	return WallType
 }
 
 func (w WallTile) String() string {
 	return string(w.TileType())
 }
 
-type StartTile struct {
-	heading Heading
-}
+// type StartTile struct {
+// 	heading Heading
+// }
 
-func (s StartTile) Heading() Heading {
-	return s.heading
-}
+// func (s StartTile) Heading() Heading {
+// 	return s.heading
+// }
 
-func (s StartTile) String() string {
-	return string(s.TileType())
-}
+// func (s StartTile) String() string {
+// 	return string(s.TileType())
+// }
 
-func (s StartTile) TileType() TileType {
-	return Start
-}
+// func (s StartTile) TileType() TileType {
+// 	return Start
+// }
 
-type FinishTile struct {
-	cost int
-}
+// type FinishTile struct {
+// 	cost int
+// }
 
-func NewFinishTile() FinishTile {
-	return FinishTile{
-		cost: math.MaxInt,
-	}
-}
+// func NewFinishTile() FinishTile {
+// 	return FinishTile{
+// 		cost: math.MaxInt,
+// 	}
+// }
 
-func (f FinishTile) TileType() TileType {
-	return Finish
-}
+// func (f FinishTile) TileType() TileType {
+// 	return Finish
+// }
 
-func (f FinishTile) String() string {
-	return string(f.TileType())
-}
+// func (f FinishTile) String() string {
+// 	return string(f.TileType())
+// }

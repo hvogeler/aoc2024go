@@ -10,8 +10,18 @@ func Test_FromString(t *testing.T) {
 	t.Run("Example Data1", func(t *testing.T) {
 		data := ReadData("../example1.dat")
 		fmt.Println(data)
-		maze := MazeFromStr(data)
-		fmt.Println(maze)
+		m := MazeFromStr(data)
+		fmt.Println(m)
+
+		x := m.tiles[NewPosition(1,3)].(*NodeTile)
+		x.cost = 42
+		fmt.Println(m.tiles[NewPosition(1,3)].(*NodeTile).cost)
+		if m.tiles[NewPosition(1,3)].(*NodeTile).cost != 42 {
+			t.Errorf("Expected 42")
+		}
+
+		m.FindPath()
+		fmt.Println(m)
 	})
 }
 
@@ -34,7 +44,7 @@ func Test_PriorityQueue(t *testing.T) {
 
 		l := (*h).Len()
 		for i := 0; i < l; i++ {
-			topNt := heap.Pop(h).(NodeTile)
+			topNt := heap.Pop(h).(*NodeTile)
 			fmt.Printf("Top Tile %s, Cost: %d\n", topNt.pos, topNt.cost)
 		}
 	})
