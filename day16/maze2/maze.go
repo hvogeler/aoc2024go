@@ -88,6 +88,33 @@ func (m Maze) String() string {
 	return s.String()
 }
 
+func (m Maze) ShortestPath() ShortestPath {
+	return NewShortestPath(&m)
+}
+
+func (m Maze) PrintPath() string {
+	var s strings.Builder
+	sp := m.ShortestPath()
+	for row := 0; row < m.dimensions.rows; row++ {
+		s.WriteString(fmt.Sprintf("%4d. ", row))
+		for col := 0; col < m.dimensions.cols; col++ {
+			tile := m.Tile(row, col)
+			switch ntile := tile.(type) {
+			case WallTile:
+				s.WriteString(fmt.Sprint(tile))
+			case *NodeTile:
+				if _, exists := sp.pathByPos[ntile.pos]; (exists || ntile.TileType() == FinishType) {
+					s.WriteString(fmt.Sprint(tile))
+				} else {
+					s.WriteString(fmt.Sprint(NodeType))
+				}
+			}
+		}
+		s.WriteString(fmt.Sprintln())
+	}
+	return s.String()
+}
+
 func MazeFromStr(s string) Maze {
 	newMaze := Maze{}
 	tiles := make(map[Position]Tile)

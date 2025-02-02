@@ -22,6 +22,7 @@ func Test_FromString(t *testing.T) {
 
 		m.FindPath()
 		fmt.Println(m)
+		fmt.Println(m.PrintPath())
 	})
 }
 
