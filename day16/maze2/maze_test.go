@@ -13,17 +13,60 @@ func Test_FromString(t *testing.T) {
 		m := MazeFromStr(data)
 		fmt.Println(m)
 
-		x := m.tiles[NewPosition(1,3)].(*NodeTile)
-		x.cost = 42
-		fmt.Println(m.tiles[NewPosition(1,3)].(*NodeTile).cost)
-		if m.tiles[NewPosition(1,3)].(*NodeTile).cost != 42 {
-			t.Errorf("Expected 42")
+		m.FindPath()
+		fmt.Println(m)
+		fmt.Println(m.PrintPath())
+		fmt.Printf("Cost: %d\n", m.Score())
+		if m.Score() != 7036 {
+			t.Errorf("Expected low score 7036, got %d", m.Score())
 		}
+	})
+
+	t.Run("Example Data2", func(t *testing.T) {
+		data := ReadData("../example2.dat")
+		fmt.Println(data)
+		m := MazeFromStr(data)
+		fmt.Println(m)
 
 		m.FindPath()
 		fmt.Println(m)
 		fmt.Println(m.PrintPath())
+		fmt.Printf("Cost: %d\n", m.Score())
+		if m.Score() != 11048 {
+			t.Errorf("Expected low score 11048, got %d", m.Score())
+		}
 	})
+
+	t.Run("Example Data3", func(t *testing.T) {
+		data := ReadData("../example3.dat")
+		fmt.Println(data)
+		m := MazeFromStr(data)
+		fmt.Println(m)
+
+		m.FindPath()
+		fmt.Println(m)
+		fmt.Println(m.PrintPath())
+		fmt.Printf("Cost: %d\n", m.Score())
+		if m.Score() != 21148 {
+			t.Errorf("Expected low score 21148, got %d", m.Score())
+		}
+	})
+
+	t.Run("Example Data4", func(t *testing.T) {
+		data := ReadData("../example4.dat")
+		fmt.Println(data)
+		m := MazeFromStr(data)
+		fmt.Println(m)
+
+		m.FindPath()
+		fmt.Println(m)
+		fmt.Println(m.PrintPath())
+		fmt.Printf("Cost: %d\n", m.Score())
+		if m.Score() != 4013 {
+			t.Errorf("Expected low score 4013, got %d", m.Score())
+		}
+	})
+
 }
 
 func Test_PriorityQueue(t *testing.T) {

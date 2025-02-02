@@ -29,16 +29,16 @@ func Headings() []Heading {
 func (srcHeading Heading) Cost(tgtHeading Heading) int {
 	if (srcHeading == North || srcHeading == South) &&
 		(tgtHeading == East || tgtHeading == West) {
-		return 1001
+		return 1000
 	}
 	if (srcHeading == East || srcHeading == West) &&
 		(tgtHeading == North || tgtHeading == South) {
-		return 1001
+		return 1000
 	}
 	if srcHeading.IsOpposite(tgtHeading) {
-		return 2001
+		return 2000
 	}
-	return 1
+	return 0
 }
 
 func (srcHeading Heading) IsOpposite(tgtHeading Heading) bool {

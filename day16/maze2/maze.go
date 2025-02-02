@@ -27,11 +27,16 @@ func (m *Maze) FindPath() {
 			if neighbor.TileType() == WallType || srcNode.heading.IsOpposite(heading) {
 				continue
 			}
-			if neighbor.TileType() == NodeType {
+			if neighbor.TileType() == NodeType{
 				tgtNode := neighbor.(*NodeTile)
-				cost := srcNode.cost + srcNode.heading.Cost(heading)
-				if cost < tgtNode.cost {
-					tgtNode.cost = cost
+				// if tgtNode.isExplored {
+				// 	continue
+				// }
+				cost := srcNode.cost + srcNode.heading.Cost(heading) + 1
+				tgtCost := tgtNode.cost
+				if cost < tgtCost {
+				srcNode.cost += srcNode.heading.Cost(heading)
+				tgtNode.cost = cost
 					tgtNode.preTile = srcNode
 					tgtNode.heading = heading
 					heap.Push(pq, tgtNode)
@@ -44,7 +49,14 @@ func (m *Maze) FindPath() {
 			break
 		}
 		srcNode = heap.Pop(pq).(*NodeTile)
+		for pq.Len() >0 && srcNode.isExplored {
+			srcNode = heap.Pop(pq).(*NodeTile)
+		}
 	}
+}
+
+func (m Maze) Score() int {
+	return m.finishTile.cost
 }
 
 // func (m Maze) Neighbors(node NodeTile) (*NodeTile, Heading) {
