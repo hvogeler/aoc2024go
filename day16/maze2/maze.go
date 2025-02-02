@@ -29,13 +29,9 @@ func (m *Maze) FindPath() {
 			}
 			if neighbor.TileType() == NodeType{
 				tgtNode := neighbor.(*NodeTile)
-				// if tgtNode.isExplored {
-				// 	continue
-				// }
 				cost := srcNode.cost + srcNode.heading.Cost(heading) + 1
 				tgtCost := tgtNode.cost
 				if cost < tgtCost {
-				srcNode.cost += srcNode.heading.Cost(heading)
 				tgtNode.cost = cost
 					tgtNode.preTile = srcNode
 					tgtNode.heading = heading
