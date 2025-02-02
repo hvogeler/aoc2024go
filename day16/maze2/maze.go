@@ -16,6 +16,8 @@ type Maze struct {
 
 // findPath will set the cost of the Finish Tile to the cost of the shortset path.
 // It will also point back from the Finish Tile to the preceeding tile.
+
+//TODO: You need to allow entering some cell facing a given direction, even if you've already reached the same cell facing a different direction. So, the nodes in the graph you're searching should include the direction you're facing. I.e. your distance array should be distance[x][y][dir]
 func (m *Maze) FindPath() {
 	srcNode := m.startTile
 	pq := &NodeHeap{}
