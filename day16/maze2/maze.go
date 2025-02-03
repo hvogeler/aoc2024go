@@ -52,7 +52,6 @@ func (m *Maze) FindPath() {
 					tgtNode.cost = cost
 					tgtNode.preTile = srcNode
 					tgtNode.heading = heading
-					m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)] = tgtNode
 					heap.Push(pq, tgtNode)
 				}
 			}
@@ -134,6 +133,7 @@ func (m Maze) String() string {
 		}
 		s.WriteString(fmt.Sprintln())
 	}
+    s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
 	return s.String()
 }
 
@@ -161,6 +161,7 @@ func (m Maze) PrintPath() string {
 		}
 		s.WriteString(fmt.Sprintln())
 	}
+    s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
 	return s.String()
 }
 
