@@ -5,14 +5,15 @@ import "fmt"
 type Position struct {
 	row int
 	col int
+	heading Heading
 }
 
-func NewPosition(row, col int) Position {
-	return Position{row, col}
+func NewPosition(row, col int, heading Heading) Position {
+	return Position{row, col, heading}
 }
 
 func (pos Position) String() string {
-	s := fmt.Sprintf("(%d, %d)", pos.row, pos.col)
+	s := fmt.Sprintf("(%d, %d, %s)", pos.row, pos.col, pos.heading)
 	return s
 }
 

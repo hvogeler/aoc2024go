@@ -15,11 +15,12 @@ const (
 type Heading string
 
 const (
-	North     Heading = "^"
-	East      Heading = ">"
-	South     Heading = "v"
-	West      Heading = "<"
-	Undefined Heading = "."
+	North      Heading = "^"
+	East       Heading = ">"
+	South      Heading = "v"
+	West       Heading = "<"
+	Undefined  Heading = "."
+	AnyHeading Heading = "o"
 )
 
 func Headings() []Heading {
@@ -96,7 +97,7 @@ func NewNodeTile(row int, col int) *NodeTile {
 		cost:       math.MaxInt,
 		isExplored: false,
 		heading:    Undefined,
-		pos:        NewPosition(row, col),
+		pos:        NewPosition(row, col, Undefined),
 		preTile:    nil,
 	}
 }
