@@ -104,6 +104,32 @@ func Test_FromString(t *testing.T) {
 		}
 	})
 
+	t.Run("Example Data9", func(t *testing.T) {
+		data := ReadData("../example9.dat")
+		fmt.Println(data)
+		m := MazeFromStr(data)
+		fmt.Println(m)
+
+		m.FindPath()
+		fmt.Printf("Cost: %d\n", m.Score())
+		if m.Score() != 21110 {
+			t.Errorf("Expected low score 21110, got %d", m.Score())
+		}
+
+		p := []*NodeTile{}
+		m.WalkShortestPaths(m.finishTile, p)
+		for i, path := range m.ShortestPaths() {
+            fmt.Println(i)
+			fmt.Println(m.PrintPath(path))
+            fmt.Println()
+		}
+
+		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
+		if m.CountAllVisitedTiles() != 264 {
+			t.Errorf("Expected tiles 264, got %d", m.CountAllVisitedTiles())
+		}
+	})
+
 	t.Run("Example Data3", func(t *testing.T) {
 		data := ReadData("../example3.dat")
 		fmt.Println(data)
