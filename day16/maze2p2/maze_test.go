@@ -25,8 +25,10 @@ func Test_FromString(t *testing.T) {
 			fmt.Println(m.PrintPath(path))
 		}
 
-
 		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
+		if m.CountAllVisitedTiles() != 45 {
+			t.Errorf("Expected tiles 45, got %d", m.CountAllVisitedTiles())
+		}
 	})
 
 	t.Run("Example Data2", func(t *testing.T) {
@@ -49,7 +51,57 @@ func Test_FromString(t *testing.T) {
 
 
 		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
+		if m.CountAllVisitedTiles() != 64 {
+			t.Errorf("Expected tiles 64, got %d", m.CountAllVisitedTiles())
+		}
+	})
 
+	t.Run("Example Data5", func(t *testing.T) {
+		data := ReadData("../example5.dat")
+		fmt.Println(data)
+		m := MazeFromStr(data)
+		fmt.Println(m)
+
+		m.FindPath()
+		fmt.Printf("Cost: %d\n", m.Score())
+		if m.Score() != 5078 {
+			t.Errorf("Expected low score 5078, got %d", m.Score())
+		}
+
+		p := []*NodeTile{}
+		m.WalkShortestPaths(m.finishTile, p)
+		for _, path := range m.ShortestPaths() {
+			fmt.Println(m.PrintPath(path))
+		}
+
+		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
+		if m.CountAllVisitedTiles() != 413 {
+			t.Errorf("Expected tiles 413, got %d", m.CountAllVisitedTiles())
+		}
+	})
+
+	t.Run("Example Data6", func(t *testing.T) {
+		data := ReadData("../example6.dat")
+		fmt.Println(data)
+		m := MazeFromStr(data)
+		fmt.Println(m)
+
+		m.FindPath()
+		fmt.Printf("Cost: %d\n", m.Score())
+		if m.Score() != 21110 {
+			t.Errorf("Expected low score 21110, got %d", m.Score())
+		}
+
+		p := []*NodeTile{}
+		m.WalkShortestPaths(m.finishTile, p)
+		// for _, path := range m.ShortestPaths() {
+		// 	fmt.Println(m.PrintPath(path))
+		// }
+
+		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
+		if m.CountAllVisitedTiles() != 264 {
+			t.Errorf("Expected tiles 264, got %d", m.CountAllVisitedTiles())
+		}
 	})
 
 	t.Run("Example Data3", func(t *testing.T) {
