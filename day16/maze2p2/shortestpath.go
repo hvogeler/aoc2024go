@@ -31,16 +31,3 @@ func NewShortestPath(path []*NodeTile) ShortestPath {
 		pathByPos: pm,
 	}
 }
-
-func (m *Maze) WalkShortestPaths(tile *NodeTile, path []*NodeTile) {
-	path = append(path, tile)
-	for i, preTile := range tile.preTile {
-		if i > 0 {
-			newPath := path
-			m.shortestPaths = append(m.shortestPaths, newPath)
-            m.WalkShortestPaths(preTile, newPath)
-		}
-		m.WalkShortestPaths(preTile, path)
-		
-	}
-}

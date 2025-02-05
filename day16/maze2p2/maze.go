@@ -147,6 +147,36 @@ func (m Maze) ShortestPaths() [][]*NodeTile {
 	return m.shortestPaths
 }
 
+func (m Maze) FinishTile() *NodeTile {
+	return m.finishTile
+}
+
+func (m Maze) CountAllVisitedTiles() int {
+    tileMap := make(map[Position] bool)
+    for _, path := range m.ShortestPaths() {
+        for _, tile := range path {
+            tileMap[tile.pos] = true
+        }
+    }
+    return len(tileMap)
+}
+
+func (m *Maze) WalkShortestPaths(tile *NodeTile, path []*NodeTile) {
+	path = append(path, tile)
+    if tile.nodeType == Start {
+        m.shortestPaths = append(m.shortestPaths, path)
+        return
+    }
+	for i, preTile := range tile.preTile {
+		if i > 0 {
+			newPath := path
+            m.WalkShortestPaths(preTile, newPath)
+		} else {
+		m.WalkShortestPaths(preTile, path)
+        }
+	}
+}
+
 func (m Maze) PrintPath(path []*NodeTile) string {
 	var s strings.Builder
 	sp := NewShortestPath(path)

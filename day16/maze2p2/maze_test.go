@@ -9,27 +9,24 @@ import (
 func Test_FromString(t *testing.T) {
 	t.Run("Example Data1", func(t *testing.T) {
 		data := ReadData("../example1.dat")
-		fmt.Println(data)
+		// fmt.Println(data)
 		m := MazeFromStr(data)
-		fmt.Println(m)
+		// fmt.Println(m)
 
 		m.FindPath()
-		p := []*NodeTile{}
-		m.WalkShortestPaths(m.finishTile, p)
-		fmt.Println(m.PrintPath(m.ShortestPaths()[2]))
-		// fmt.Println(m)
-		// for _, tile := range m.tiles {
-		// 	if nt, ok := tile.(*NodeTile); ok {
-		// 		if len(nt.preTile) > 1 {
-		// 			fmt.Println(nt.pos)
-		// 		}
-		// 	}
-		// }
-		// fmt.Println(m.PrintPath())
-		fmt.Printf("Cost: %d\n", m.Score())
+		fmt.Printf("Cost Part1: %d\n", m.Score())
 		if m.Score() != 7036 {
 			t.Errorf("Expected low score 7036, got %d", m.Score())
 		}
+
+		p := []*NodeTile{}
+		m.WalkShortestPaths(m.finishTile, p)
+		for _, path := range m.ShortestPaths() {
+			fmt.Println(m.PrintPath(path))
+		}
+
+
+		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
 	})
 
 	t.Run("Example Data2", func(t *testing.T) {
@@ -39,12 +36,20 @@ func Test_FromString(t *testing.T) {
 		fmt.Println(m)
 
 		m.FindPath()
-		fmt.Println(m)
-		// fmt.Println(m.PrintPath())
 		fmt.Printf("Cost: %d\n", m.Score())
 		if m.Score() != 11048 {
 			t.Errorf("Expected low score 11048, got %d", m.Score())
 		}
+
+		p := []*NodeTile{}
+		m.WalkShortestPaths(m.finishTile, p)
+		for _, path := range m.ShortestPaths() {
+			fmt.Println(m.PrintPath(path))
+		}
+
+
+		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
+
 	})
 
 	t.Run("Example Data3", func(t *testing.T) {
