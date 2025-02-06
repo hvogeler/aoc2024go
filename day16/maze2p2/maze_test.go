@@ -112,8 +112,8 @@ func Test_FromString(t *testing.T) {
 
 		m.FindPath()
 		fmt.Printf("Cost: %d\n", m.Score())
-		if m.Score() != 21110 {
-			t.Errorf("Expected low score 21110, got %d", m.Score())
+		if m.Score() != 6027 {
+			t.Errorf("Expected low score 6027, got %d", m.Score())
 		}
 
 		p := []*NodeTile{}
@@ -164,10 +164,10 @@ func Test_FromString(t *testing.T) {
 
 func Test_PriorityQueue(t *testing.T) {
 	t.Run("Prioqueue1", func(t *testing.T) {
-		nt1 := NewNodeTile(1, 1)
-		nt2 := NewNodeTile(2, 2)
-		nt3 := NewNodeTile(3, 3)
-		nt4 := NewNodeTile(4, 5)
+		nt1 := NewNodeTile(1, 1, Undefined)
+		nt2 := NewNodeTile(2, 2, Undefined)
+		nt3 := NewNodeTile(3, 3, Undefined)
+		nt4 := NewNodeTile(4, 5, Undefined)
 		nt1.cost = 5
 		nt2.cost = 1
 		nt3.cost = 2

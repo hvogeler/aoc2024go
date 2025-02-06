@@ -8,10 +8,10 @@ import (
 )
 
 type Maze struct {
-	tiles      map[Position]Tile
-	startTile  *NodeTile
-	finishTile *NodeTile
-	dimensions Dimensions
+	tiles         map[Position]Tile
+	startTile     *NodeTile
+	finishTile    *NodeTile
+	dimensions    Dimensions
 	shortestPaths [][]*NodeTile
 }
 
@@ -19,8 +19,8 @@ type Maze struct {
 // It will also point back from the Finish Tile to the preceeding tile.
 
 // https://www.reddit.com/r/adventofcode/comments/1hfmbel/2024_day_16_part_1_c_stuck_in_part_1/
-// You need to allow entering some cell facing a given direction, even if you've already reached 
-// the same cell facing a different direction. So, the nodes in the graph you're searching should 
+// You need to allow entering some cell facing a given direction, even if you've already reached
+// the same cell facing a different direction. So, the nodes in the graph you're searching should
 // include the direction you're facing. I.e. your distance array should be distance[x][y][dir]
 func (m *Maze) FindPath() {
 	srcNode := m.startTile
@@ -43,7 +43,7 @@ func (m *Maze) FindPath() {
 					// case: o>
 					//       ^   -  o costs 1000
 					if tgtNode.heading != heading {
-						m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)] = NewNodeTile(tgtNode.pos.row, tgtNode.pos.col)
+						m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)] = NewNodeTile(tgtNode.pos.row, tgtNode.pos.col, heading)
 						tgtNode = m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)].(*NodeTile)
 					}
 				}
@@ -58,8 +58,10 @@ func (m *Maze) FindPath() {
 				if cost == tgtCost {
 					tgtNode.preTile = append(tgtNode.preTile, srcNode)
 					tgtNode.heading = heading
-					heap.Push(pq, tgtNode)	// ????		
+					heap.Push(pq, tgtNode) // ????
 				}
+                tgtNode.Println(true)
+
 			}
 		}
 		srcNode.isExplored = true
@@ -139,7 +141,7 @@ func (m Maze) String() string {
 		}
 		s.WriteString(fmt.Sprintln())
 	}
-    s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
+	s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
 	return s.String()
 }
 
@@ -152,28 +154,28 @@ func (m Maze) FinishTile() *NodeTile {
 }
 
 func (m Maze) CountAllVisitedTiles() int {
-    tileMap := make(map[Position] bool)
-    for _, path := range m.ShortestPaths() {
-        for _, tile := range path {
-            tileMap[tile.pos] = true
-        }
-    }
-    return len(tileMap)
+	tileMap := make(map[Position]bool)
+	for _, path := range m.ShortestPaths() {
+		for _, tile := range path {
+			tileMap[tile.pos] = true
+		}
+	}
+	return len(tileMap)
 }
 
 func (m *Maze) WalkShortestPaths(tile *NodeTile, path []*NodeTile) {
 	path = append(path, tile)
-    if tile.nodeType == Start {
-        m.shortestPaths = append(m.shortestPaths, path)
-        return
-    }
+	if tile.nodeType == Start {
+		m.shortestPaths = append(m.shortestPaths, path)
+		return
+	}
 	for i, preTile := range tile.preTile {
 		if i > 0 {
 			newPath := path
-            m.WalkShortestPaths(preTile, newPath)
+			m.WalkShortestPaths(preTile, newPath)
 		} else {
-		m.WalkShortestPaths(preTile, path)
-        }
+			m.WalkShortestPaths(preTile, path)
+		}
 	}
 }
 
@@ -188,16 +190,23 @@ func (m Maze) PrintPath(path []*NodeTile) string {
 			case WallTile:
 				s.WriteString(fmt.Sprint(tile))
 			case *NodeTile:
-				if _, exists := sp.pathByPos[ntile.pos]; exists || ntile.TileType() == FinishType {
-					s.WriteString(fmt.Sprint(tile))
+				if pathTile, exists := sp.pathByPos[ntile.pos]; exists || ntile.TileType() == FinishType {
+                    switch pathTile.nodeType {
+                    case Finish: 
+						s.WriteString(fmt.Sprint(FinishType))
+					case Start:
+						s.WriteString(fmt.Sprint(StartType))
+                    default:
+                        s.WriteString(fmt.Sprint(tile))
+					}
 				} else {
 					s.WriteString(fmt.Sprint(NodeType))
 				}
-			}
-		}
+            }
+        }
 		s.WriteString(fmt.Sprintln())
 	}
-    s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
+	s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
 	return s.String()
 }
 
@@ -218,19 +227,19 @@ func MazeFromStr(s string) Maze {
 				tile := WallTile{}
 				tiles[NewPosition(rowno, colno, Undefined)] = tile
 			case StartType:
-				newNode := NewNodeTile(rowno, colno)
+				newNode := NewNodeTile(rowno, colno, East)
 				newNode.nodeType = Start
-				newNode.heading = East
+				// newNode.heading = East
 				newNode.cost = 0
 				tiles[NewPosition(rowno, colno, Undefined)] = newNode
 				newMaze.startTile = newNode
 			case FinishType:
-				newNode := NewNodeTile(rowno, colno)
+				newNode := NewNodeTile(rowno, colno, Undefined)
 				newNode.nodeType = Finish
 				tiles[NewPosition(rowno, colno, Undefined)] = newNode
 				newMaze.finishTile = newNode
 			case NodeType:
-				tiles[NewPosition(rowno, colno, Undefined)] = NewNodeTile(rowno, colno)
+				tiles[NewPosition(rowno, colno, Undefined)] = NewNodeTile(rowno, colno, Undefined)
 			}
 		}
 	}

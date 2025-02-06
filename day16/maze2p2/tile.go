@@ -1,6 +1,9 @@
 package maze2p2
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type TileType string
 
@@ -75,6 +78,22 @@ func (n NodeTile) TileType() TileType {
 	return NodeType
 }
 
+func (n NodeTile) Println(withPreTiles bool) {
+	fmt.Printf("Tile: %s - Heading: %s - Cost: %d - PreTiles: %d - IsExplored: %v", n.pos, n.heading, n.cost, len(n.preTile), n.isExplored)
+	if withPreTiles {
+		fmt.Println("")
+		for i, preT := range n.preTile {
+			fmt.Printf("   %d. ", i)
+			preT.Println(false)
+			fmt.Println("")
+		}
+	}
+}
+
+func (n *NodeTile) SetPosition(pos Position) {
+	n.pos = pos
+}
+
 func (n NodeTile) String() string {
 	switch n.nodeType {
 	case Intermediate:
@@ -92,11 +111,11 @@ func (n NodeTile) Heading() Heading {
 	return n.heading
 }
 
-func NewNodeTile(row int, col int) *NodeTile {
+func NewNodeTile(row int, col int, h Heading) *NodeTile {
 	return &NodeTile{
 		cost:       math.MaxInt,
 		isExplored: false,
-		heading:    Undefined,
+		heading:    h,
 		pos:        NewPosition(row, col, Undefined),
 		preTile:    []*NodeTile{},
 	}
