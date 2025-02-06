@@ -14,6 +14,15 @@ func Test_FromString(t *testing.T) {
 		// fmt.Println(m)
 
 		m.FindPath()
+        // fmt.Println()
+		// for _, tile := range m.tiles {
+		// 	if ntile, ok := tile.(*NodeTile); ok {
+		// 		if ntile.pos.row == m.finishTile.pos.row && ntile.pos.col == m.finishTile.pos.col {
+		// 			ntile.Println(false)
+        //             fmt.Println()
+		// 		}
+		// 	}
+		// }
 		fmt.Printf("Cost Part1: %d\n", m.Score())
 		if m.Score() != 7036 {
 			t.Errorf("Expected low score 7036, got %d", m.Score())
@@ -48,7 +57,6 @@ func Test_FromString(t *testing.T) {
 		for _, path := range m.ShortestPaths() {
 			fmt.Println(m.PrintPath(path))
 		}
-
 
 		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
 		if m.CountAllVisitedTiles() != 64 {
@@ -119,9 +127,9 @@ func Test_FromString(t *testing.T) {
 		p := []*NodeTile{}
 		m.WalkShortestPaths(m.finishTile, p)
 		for i, path := range m.ShortestPaths() {
-            fmt.Println(i)
+			fmt.Println(i)
 			fmt.Println(m.PrintPath(path))
-            fmt.Println()
+			fmt.Println()
 		}
 
 		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())

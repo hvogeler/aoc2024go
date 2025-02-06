@@ -116,7 +116,7 @@ func NewNodeTile(row int, col int, h Heading) *NodeTile {
 		cost:       math.MaxInt,
 		isExplored: false,
 		heading:    h,
-		pos:        NewPosition(row, col, Undefined),
+		pos:        NewPosition(row, col, h),
 		preTile:    []*NodeTile{},
 	}
 }

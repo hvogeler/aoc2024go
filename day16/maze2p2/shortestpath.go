@@ -2,9 +2,19 @@ package maze2p2
 
 import "sort"
 
+type Location struct {
+	row int
+	col int
+}
+
+func NewLocation(row int, col int) Location {
+	return Location{row, col}
+}
+
 type ShortestPath struct {
 	path []*NodeTile
 	pathByPos map[Position]*NodeTile
+	pathByLoc map[Location]*NodeTile
 }
 
 func NewShortestPath(path []*NodeTile) ShortestPath {
@@ -26,8 +36,14 @@ func NewShortestPath(path []*NodeTile) ShortestPath {
 		pm[tile.pos] = tile
 	}
 
+	lm := make(map[Location]*NodeTile)
+	for _, tile := range path {
+		lm[NewLocation(tile.pos.row, tile.pos.col)] = tile
+	}
+
 	return ShortestPath{
 		path: path,
 		pathByPos: pm,
+		pathByLoc: lm,
 	}
 }
