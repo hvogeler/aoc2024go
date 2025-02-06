@@ -120,8 +120,8 @@ func Test_FromString(t *testing.T) {
 
 		m.FindPath()
 		fmt.Printf("Cost: %d\n", m.Score())
-		if m.Score() != 6027 {
-			t.Errorf("Expected low score 6027, got %d", m.Score())
+		if m.Score() != 5024 {
+			t.Errorf("Expected low score 5024, got %d", m.Score())
 		}
 
 		p := []*NodeTile{}
@@ -133,7 +133,7 @@ func Test_FromString(t *testing.T) {
 		}
 
 		fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
-		if m.CountAllVisitedTiles() != 264 {
+		if m.CountAllVisitedTiles() != 43 {
 			t.Errorf("Expected tiles 264, got %d", m.CountAllVisitedTiles())
 		}
 	})

@@ -21,7 +21,6 @@ func main() {
 		fmt.Println(m.PrintPath(path))
 	}
 
-
 	fmt.Printf("Number of visited tiles Part 2: %d\n", m.CountAllVisitedTiles())
 
 }

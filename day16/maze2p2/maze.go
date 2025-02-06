@@ -199,13 +199,18 @@ func (m Maze) CountAllVisitedTiles() int {
 	return len(tiles)
 }
 
-func (m *Maze) WalkShortestPaths(tile *NodeTile, path []*NodeTile) {
-	path = append(path, tile)
-	if tile.nodeType == Start {
-		m.shortestPaths = append(m.shortestPaths, path)
+func (m *Maze) WalkShortestPaths(finishTile *NodeTile, path []*NodeTile) {
+	path = append(path, finishTile)
+	if finishTile.nodeType == Start {
+        p := make([]*NodeTile, len(path))
+        copy(p, path)
+        // for i, elem := range path {
+        //     p[i] = elem
+        // }
+		m.shortestPaths = append(m.shortestPaths, p)
 		return
 	}
-	for i, preTile := range tile.preTile {
+	for i, preTile := range finishTile.preTile {
 		if i > 0 {
 			newPath := path
 			m.WalkShortestPaths(preTile, newPath)
