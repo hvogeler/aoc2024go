@@ -30,51 +30,36 @@ func (m *Maze) FindPath() {
 	for {
 		// Process Phase
 		for _, heading := range Headings() {
-            if srcNode.heading.IsOpposite(heading) {
-                continue
-            }
+			if srcNode.heading.IsOpposite(heading) {
+                // Don't go backwards. Its is a DAG
+				continue
+			}
 			neighbor := m.NeighborTile(*srcNode, heading)
-			if neighbor.TileType() == WallType  {
+			if neighbor.TileType() == WallType {
 				continue
 			}
 			if neighbor.TileType() == NodeType {
 				tgtNode := neighbor.(*NodeTile)
-				// if tgtNode.heading == Undefined {
-				// 	m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)] = NewNodeTile(tgtNode.pos.row, tgtNode.pos.col, heading)
-				// 	delete(m.tiles, NewPosition(tgtNode.pos.row, tgtNode.pos.col, Undefined))
-				// 	tgtNode = m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)].(*NodeTile)
-				// }
-				// create new node if getting to a node from a different heading.
-				// Nodes have different cost depending whether they were approached straight ahead
-				// or from the side
-				// case: >o> -  o cost is 1
-				// case: o>
-				//       ^   -  o costs 1000
-				// if tgtNode.heading != heading {
-				// 	m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)] = NewNodeTile(tgtNode.pos.row, tgtNode.pos.col, heading)
-				// 	tgtNode = m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)].(*NodeTile)
-				// }
 				cost := srcNode.cost + srcNode.heading.Cost(heading) + 1
 				tgtCost := tgtNode.cost
 				if cost < tgtCost {
+                    // Relax node
 					tgtNode.cost = cost
 					tgtNode.preTile = []*NodeTile{srcNode}
 					tgtNode.heading = heading
 					heap.Push(pq, tgtNode)
-                    if tgtNode.pos.row == m.finishTile.pos.row && tgtNode.pos.col == m.finishTile.pos.col {
-                        tgtNode.nodeType = Finish
-                        if tgtNode.cost == m.finishTile.cost {
-                            fmt.Println("*********** NEW EQUAL FINISH **********")
-                        }
-                        if tgtNode.cost < m.finishTile.cost {
-                            m.finishTile = tgtNode
-                        }
-                    }
+					if tgtNode.pos.row == m.finishTile.pos.row && tgtNode.pos.col == m.finishTile.pos.col {
+						tgtNode.nodeType = Finish
+						if tgtNode.cost < m.finishTile.cost {
+							m.finishTile = tgtNode
+						}
+					}
 				}
 				if cost == tgtCost {
+                    // Add new possible shortest path to node
 					tgtNode.preTile = append(tgtNode.preTile, srcNode)
 					tgtNode.heading = heading
-					heap.Push(pq, tgtNode) // ????
+					heap.Push(pq, tgtNode)
 				}
 				// tgtNode.Println(true)
 			}
@@ -113,12 +98,15 @@ func (m *Maze) NeighborTile(tile NodeTile, h Heading) Tile {
 	if exists {
 		return ntile
 	} else {
-        m.tiles[NewPosition(nPos.row, nPos.col, nPos.heading)] = NewNodeTile(nPos.row, nPos.col, nPos.heading)
-        // tgtNode = m.tiles[NewPosition(tgtNode.pos.row, tgtNode.pos.col, heading)].(*NodeTile)
-
+		// create new node if getting to a node from a different heading.
+		// Nodes have different cost depending whether they were approached straight ahead
+		// or from the side
+		// case: >o> -  o cost is 1
+		// case: o>
+		//       ^   -  o costs 1000
+		m.tiles[NewPosition(nPos.row, nPos.col, nPos.heading)] = NewNodeTile(nPos.row, nPos.col, nPos.heading)
 		return m.tiles[NewPosition(nPos.row, nPos.col, nPos.heading)]
 	}
-
 }
 
 func (m Maze) Tile(row int, col int, h Heading) (Tile, bool) {
@@ -141,28 +129,31 @@ func (m Maze) Tile(row int, col int, h Heading) (Tile, bool) {
 }
 
 func (m Maze) AnyTile(row int, col int, sp ShortestPath) Tile {
-    if pathTile, ok := sp.pathByLoc[NewLocation(row, col)]; ok {
-        return pathTile
-    }
-    if wall, ok := m.tiles[NewPosition(row, col, Undefined)]; ok {
-        return wall
-    }
-    return NewNodeTile(row, col, Undefined)
+	if pathTile, ok := sp.pathByLoc[NewLocation(row, col)]; ok {
+		return pathTile
+	}
+	if wall, ok := m.tiles[NewPosition(row, col, Undefined)]; ok {
+		return wall
+	}
+	return NewNodeTile(row, col, Undefined)
 }
 
-// func (m Maze) String() string {
-// 	var s strings.Builder
-// 	for row := 0; row < m.dimensions.rows; row++ {
-// 		s.WriteString(fmt.Sprintf("%4d. ", row))
-// 		for col := 0; col < m.dimensions.cols; col++ {
-// 			tile := m.AnyTile(row, col, Undefined)
-// 			s.WriteString(fmt.Sprint(tile))
-// 		}
-// 		s.WriteString(fmt.Sprintln())
-// 	}
-// 	s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
-// 	return s.String()
-// }
+func (m Maze) String() string {
+	var s strings.Builder
+	for row := 0; row < m.dimensions.rows; row++ {
+		s.WriteString(fmt.Sprintf("%4d. ", row))
+		for col := 0; col < m.dimensions.cols; col++ {
+			if tile, exists := m.Tile(row, col, Undefined); exists {
+            			s.WriteString(fmt.Sprint(tile))
+            } else {
+                s.WriteString(fmt.Sprint(Undefined))
+            }
+		}
+		s.WriteString(fmt.Sprintln())
+	}
+	s.WriteString(fmt.Sprintf("Number of Tiles: %d\n", len(m.tiles)))
+	return s.String()
+}
 
 func (m Maze) ShortestPaths() [][]*NodeTile {
 	return m.shortestPaths
@@ -179,22 +170,22 @@ func (m Maze) CountAllVisitedTiles() int {
 			tileMap[NewLocation(tile.pos.row, tile.pos.col)] = true
 		}
 	}
-    tiles := []Location{}
-    for k := range tileMap {
-        tiles = append(tiles, k)
-    }
+	tiles := []Location{}
+	for k := range tileMap {
+		tiles = append(tiles, k)
+	}
 
-    sort.SliceStable(tiles, func(i, j int) bool {
-        if tiles[i].row < tiles[j].row {
-            return true
-        }
-        if tiles[i].row == tiles[j].row {
-            if tiles[i].col < tiles[j].col {
-                return true
-            }
-        }
-        return false
-    })
+	sort.SliceStable(tiles, func(i, j int) bool {
+		if tiles[i].row < tiles[j].row {
+			return true
+		}
+		if tiles[i].row == tiles[j].row {
+			if tiles[i].col < tiles[j].col {
+				return true
+			}
+		}
+		return false
+	})
 
 	return len(tiles)
 }
@@ -202,11 +193,8 @@ func (m Maze) CountAllVisitedTiles() int {
 func (m *Maze) WalkShortestPaths(finishTile *NodeTile, path []*NodeTile) {
 	path = append(path, finishTile)
 	if finishTile.nodeType == Start {
-        p := make([]*NodeTile, len(path))
-        copy(p, path)
-        // for i, elem := range path {
-        //     p[i] = elem
-        // }
+		p := make([]*NodeTile, len(path))
+		copy(p, path)
 		m.shortestPaths = append(m.shortestPaths, p)
 		return
 	}
@@ -226,15 +214,15 @@ func (m Maze) PrintPath(path []*NodeTile) string {
 	for row := 0; row < m.dimensions.rows; row++ {
 		s.WriteString(fmt.Sprintf("%4d. ", row))
 		for col := 0; col < m.dimensions.cols; col++ {
-            if tile, ok := sp.pathByLoc[NewLocation(row, col)]; ok {
-                s.WriteString(fmt.Sprint(tile))
-                continue
-            }
-            if tile, ok := m.tiles[NewPosition(row, col, Undefined)]; ok {
-                s.WriteString(fmt.Sprint(tile))
-                continue
-            }
-            s.WriteString(fmt.Sprint(Undefined))
+			if tile, ok := sp.pathByLoc[NewLocation(row, col)]; ok {
+				s.WriteString(fmt.Sprint(tile))
+				continue
+			}
+			if tile, ok := m.tiles[NewPosition(row, col, Undefined)]; ok {
+				s.WriteString(fmt.Sprint(tile))
+				continue
+			}
+			s.WriteString(fmt.Sprint(Undefined))
 		}
 		s.WriteString(fmt.Sprintln())
 	}
@@ -261,17 +249,12 @@ func MazeFromStr(s string) Maze {
 			case StartType:
 				newNode := NewNodeTile(rowno, colno, East)
 				newNode.nodeType = Start
-				// newNode.heading = East
 				newNode.cost = 0
-				// tiles[NewPosition(rowno, colno, East)] = newNode
 				newMaze.startTile = newNode
 			case FinishType:
 				newNode := NewNodeTile(rowno, colno, Undefined)
 				newNode.nodeType = Finish
-				// tiles[NewPosition(rowno, colno, Undefined)] = newNode
 				newMaze.finishTile = newNode
-			case NodeType:
-				// tiles[NewPosition(rowno, colno, Undefined)] = NewNodeTile(rowno, colno, Undefined)
 			}
 		}
 	}

@@ -9,20 +9,9 @@ import (
 func Test_FromString(t *testing.T) {
 	t.Run("Example Data1", func(t *testing.T) {
 		data := ReadData("../example1.dat")
-		// fmt.Println(data)
 		m := MazeFromStr(data)
-		// fmt.Println(m)
 
 		m.FindPath()
-        // fmt.Println()
-		// for _, tile := range m.tiles {
-		// 	if ntile, ok := tile.(*NodeTile); ok {
-		// 		if ntile.pos.row == m.finishTile.pos.row && ntile.pos.col == m.finishTile.pos.col {
-		// 			ntile.Println(false)
-        //             fmt.Println()
-		// 		}
-		// 	}
-		// }
 		fmt.Printf("Cost Part1: %d\n", m.Score())
 		if m.Score() != 7036 {
 			t.Errorf("Expected low score 7036, got %d", m.Score())
@@ -42,7 +31,7 @@ func Test_FromString(t *testing.T) {
 
 	t.Run("Example Data2", func(t *testing.T) {
 		data := ReadData("../example2.dat")
-		fmt.Println(data)
+		// fmt.Println(data)
 		m := MazeFromStr(data)
 		fmt.Println(m)
 
@@ -114,7 +103,7 @@ func Test_FromString(t *testing.T) {
 
 	t.Run("Example Data9", func(t *testing.T) {
 		data := ReadData("../example9.dat")
-		fmt.Println(data)
+		// fmt.Println(data)
 		m := MazeFromStr(data)
 		fmt.Println(m)
 

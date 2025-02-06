@@ -8,7 +8,6 @@ import (
 type TileType string
 
 const (
-	// Unused TileType = "."
 	StartType  TileType = "S"
 	FinishType TileType = "E"
 	NodeType   TileType = "."
@@ -23,7 +22,6 @@ const (
 	South      Heading = "v"
 	West       Heading = "<"
 	Undefined  Heading = "."
-	AnyHeading Heading = "o"
 )
 
 func Headings() []Heading {
@@ -131,37 +129,3 @@ func (w WallTile) TileType() TileType {
 func (w WallTile) String() string {
 	return string(w.TileType())
 }
-
-// type StartTile struct {
-// 	heading Heading
-// }
-
-// func (s StartTile) Heading() Heading {
-// 	return s.heading
-// }
-
-// func (s StartTile) String() string {
-// 	return string(s.TileType())
-// }
-
-// func (s StartTile) TileType() TileType {
-// 	return Start
-// }
-
-// type FinishTile struct {
-// 	cost int
-// }
-
-// func NewFinishTile() FinishTile {
-// 	return FinishTile{
-// 		cost: math.MaxInt,
-// 	}
-// }
-
-// func (f FinishTile) TileType() TileType {
-// 	return Finish
-// }
-
-// func (f FinishTile) String() string {
-// 	return string(f.TileType())
-// }
