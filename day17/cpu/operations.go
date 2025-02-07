@@ -1,6 +1,9 @@
 package cpu
 
-import "fmt"
+import (
+	"fmt"
+	
+)
 
 var OpExec = map[OpCode]func(c *Cpu, oper Operand){
 	adv: Adv,
@@ -46,10 +49,10 @@ func Out(c *Cpu, oper Operand) {
 	output := c.Eval(oper) % 8
 	c.SetInstrPtr(c.instrPtr + 2)
 	if c.outputCount > 0 {
-		fmt.Print(",")
+		c.output += fmt.Sprint(",")
 	}
 	c.outputCount++
-	fmt.Printf("%d", output)
+	c.output += fmt.Sprintf("%d", output)
 }
 
 func Jnz(c *Cpu, oper Operand) {

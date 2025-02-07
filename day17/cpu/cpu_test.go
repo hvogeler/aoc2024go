@@ -18,5 +18,6 @@ func Test_1(t *testing.T) {
 		cpu := InitialProgramLoad(data)
 		fmt.Println(cpu.DisAssemble(-1))
 		cpu.Run()
+		fmt.Println(cpu.output)
 	})
 }

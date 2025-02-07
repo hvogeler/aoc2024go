@@ -14,6 +14,8 @@ type Cpu struct {
 	currentInstruction Instruction
 	state              CpuState
 	outputCount        int
+	rawProgramInput    string
+	output             string
 }
 
 type CpuState int
@@ -30,7 +32,7 @@ func (c *Cpu) Run() {
 	for c.state == Running {
 		c.Step()
 	}
-	fmt.Println()
+	// fmt.Println()
 }
 
 func (c *Cpu) Debug() {
@@ -45,15 +47,39 @@ func (c *Cpu) Debug() {
 }
 
 func (c *Cpu) Step() {
-    c.ExecInstr(c.currentInstruction)
+	c.ExecInstr(c.currentInstruction)
+}
+
+func (c *Cpu) Output() string {
+	return c.output
+}
+
+func (c *Cpu) RawProgramInput() string {
+	return c.rawProgramInput
+}
+
+func (c *Cpu) FindRegAVal(from int, until int, comp string) int {
+    cpuTmp := *c
+    fmt.Println(cpuTmp.DisAssemble(-1))
+    for i := from; i < until; i++ {
+        cpu := cpuTmp
+        cpu.SetRegA(i)
+        cpu.Run()
+        // fmt.Printf("%6d. Input: %s   -   Output: %s\n", i, cpu.RawProgramInput(), cpu.Output())
+        if cpu.Output() == comp {
+            // fmt.Printf("RegA must be %d to reproduce the input\n", i)
+            return i
+        }
+    }
+    return until + 1
 }
 
 func (c *Cpu) ExecInstr(instr Instruction) {
-    f, exists := OpExec[instr.op]
-    if !exists {
-        panic(fmt.Sprintf("Invalid OpCode: %s", instr))
-    }
-    f(c, instr.operand)
+	f, exists := OpExec[instr.op]
+	if !exists {
+		panic(fmt.Sprintf("Invalid OpCode: %s", instr))
+	}
+	f(c, instr.operand)
 }
 
 func (c Cpu) String() string {
@@ -155,6 +181,7 @@ func InitialProgramLoad(program string) Cpu {
 			}
 			cpu.SetRegC(v)
 		case "Program":
+            cpu.rawProgramInput = parts[1]
 			instrs := strings.Split(parts[1], ",")
 			cpu.codeMem = make([]uint8, len(instrs))
 			for i, instr := range instrs {
