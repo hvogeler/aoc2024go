@@ -14,17 +14,17 @@ var OpExec = map[OpCode]func(c *Cpu, oper Operand){
 }
 
 func Adv(c *Cpu, oper Operand) {
-	c.regA = c.regA >> oper
+	c.regA = c.regA >> c.Eval(oper)
 	c.SetInstrPtr(c.instrPtr + 2)
 }
 
 func Bdv(c *Cpu, oper Operand) {
-	c.regB = c.regA >> oper
+	c.regB = c.regA >> c.Eval(oper)
 	c.SetInstrPtr(c.instrPtr + 2)
 }
 
 func Cdv(c *Cpu, oper Operand) {
-	c.regC = c.regA >> oper
+	c.regC = c.regA >> c.Eval(oper)
 	c.SetInstrPtr(c.instrPtr + 2)
 }
 

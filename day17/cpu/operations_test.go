@@ -26,8 +26,9 @@ func Test_Adv(t *testing.T) {
 	t.Run("Adv3", func(t *testing.T) {
 		cpu := Cpu{
 			regA: 41,
+			regC: 2,
 		}
-		Adv(&cpu, 2)
+		Adv(&cpu, 6)
 		if cpu.regA != 10 {
 			t.Errorf("Expected 10, got %d", cpu.regA)
 		}
@@ -57,6 +58,16 @@ func Test_Adv(t *testing.T) {
 		cpu.ExecInstr(NewInstruction(uint8(cdv), 2))
 		if cpu.regC != 10 {
 			t.Errorf("Expected 10, got %d", cpu.regA)
+		}
+	})
+	t.Run("Cdv2", func(t *testing.T) {
+		cpu := Cpu{
+			regA: 38610541,
+			regB: 4,
+		}
+		cpu.ExecInstr(NewInstruction(uint8(cdv), 5))
+		if cpu.regC != 2413158 {
+			t.Errorf("Expected 2413158, got %d", cpu.regA)
 		}
 	})
 	t.Run("Bst", func(t *testing.T) {
