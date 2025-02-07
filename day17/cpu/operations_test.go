@@ -41,6 +41,24 @@ func Test_Adv(t *testing.T) {
 			t.Errorf("Expected 10, got %d", cpu.regA)
 		}
 	})
+	t.Run("Bdv", func(t *testing.T) {
+		cpu := Cpu{
+			regA: 41,
+		}
+		OpExec[bdv](&cpu, 2)
+		if cpu.regB != 10 {
+			t.Errorf("Expected 10, got %d", cpu.regA)
+		}
+	})
+	t.Run("Cdv", func(t *testing.T) {
+		cpu := Cpu{
+			regA: 41,
+		}
+		cpu.ExecInstr(NewInstruction(uint8(cdv), 2))
+		if cpu.regC != 10 {
+			t.Errorf("Expected 10, got %d", cpu.regA)
+		}
+	})
 	t.Run("Bst", func(t *testing.T) {
 		cpu := Cpu{
 			regA: 41,
@@ -69,6 +87,28 @@ func Test_Adv(t *testing.T) {
 		}
 		cpu.regB = 538
 		cpu.ExecInstr(NewInstruction(uint8(bxl), 6))
+		if cpu.regB != 540 {
+			t.Errorf("Expected 540, got %d", cpu.regB)
+		}
+	})
+	t.Run("Bxc", func(t *testing.T) {
+		cpu := Cpu{
+			regB: 0b010101,
+			regC: 4,
+		}
+		cpu.ExecInstr(NewInstruction(uint8(bxc), 255))
+		if cpu.regB != 0b10001 {
+			t.Errorf("Expected 0b10001, got %d", cpu.regB)
+		}
+		cpu.regB = 41
+		cpu.regC = 7
+		cpu.ExecInstr(NewInstruction(uint8(bxc), 255))
+		if cpu.regB != 46 {
+			t.Errorf("Expected 46, got %d", cpu.regB)
+		}
+		cpu.regB = 538
+		cpu.regC = 6
+		cpu.ExecInstr(NewInstruction(uint8(bxc), 255))
 		if cpu.regB != 540 {
 			t.Errorf("Expected 540, got %d", cpu.regB)
 		}
