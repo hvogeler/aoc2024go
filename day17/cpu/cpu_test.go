@@ -12,4 +12,11 @@ func Test_1(t *testing.T) {
 		cpu := InitialProgramLoad(data)
 		fmt.Println(cpu.DisAssemble(-1))
 	})
+	t.Run("Run 1", func(t *testing.T) {
+		data := ReadData("../example1.dat")
+		// fmt.Println(data)
+		cpu := InitialProgramLoad(data)
+		fmt.Println(cpu.DisAssemble(-1))
+		cpu.Run()
+	})
 }

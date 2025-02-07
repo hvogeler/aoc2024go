@@ -12,26 +12,68 @@ type Cpu struct {
 	codeMem            []uint8
 	instrPtr           int
 	currentInstruction Instruction
+	state              CpuState
+	outputCount        int
+}
+
+type CpuState int
+
+const (
+	Initialized CpuState = iota
+	Running
+	Finished
+	Crashed
+)
+
+func (c *Cpu) Run() {
+	c.state = Running
+	for c.state == Running {
+		c.Step()
+	}
+	fmt.Println()
+}
+
+func (c *Cpu) Debug() {
+	c.state = Running
+	for c.state == Running {
+		fmt.Println()
+		fmt.Println(c.DisAssemble(c.instrPtr))
+		c.Step()
+		fmt.Println(c)
+	}
+	fmt.Println("*** Program Ended ***")
+}
+
+func (c *Cpu) Step() {
+    c.ExecInstr(c.currentInstruction)
+}
+
+func (c *Cpu) ExecInstr(instr Instruction) {
+    f, exists := OpExec[instr.op]
+    if !exists {
+        panic(fmt.Sprintf("Invalid OpCode: %s", instr))
+    }
+    f(c, instr.operand)
 }
 
 func (c Cpu) String() string {
 	var s strings.Builder
 	s.WriteString(fmt.Sprintf("\nRegisters:\n  A: %d, B: %d, C: %d - Next Instruction at (%d): %s\n",
 		c.regA, c.regB, c.regC, c.instrPtr, c.currentInstruction))
-    return s.String()
+	return s.String()
 }
 
 func (c Cpu) DisAssemble(addr int) string {
 	var s strings.Builder
-    for i := 0; i<len(c.codeMem); i+=2 {
-        addrIndicator := "  "
-        if addr >= 0 && addr % 2 == 0 && addr == i {
-            addrIndicator = "->"
-        }
-        instr := c.InstrAt(i)
-        s.WriteString(fmt.Sprintf("%s %s", addrIndicator, instr.DisAssemble()))
-    }
-    return s.String()
+	for i := 0; i < len(c.codeMem); i += 2 {
+		addrIndicator := "  "
+		if addr >= 0 && addr%2 == 0 && addr == i {
+			addrIndicator = "->"
+		}
+		instr := c.InstrAt(i)
+		s.WriteString(fmt.Sprintf("%s %s", addrIndicator, instr.DisAssemble()))
+	}
+	return s.String()
 }
 
 func (c Cpu) Eval(o Operand) int {
@@ -62,15 +104,21 @@ func (c *Cpu) SetRegC(v int) {
 }
 
 func (c *Cpu) SetInstrPtr(addr int) {
+	if addr >= len(c.codeMem) {
+		c.state = Finished
+		return
+	}
+
 	c.instrPtr = addr
 	c.currentInstruction = c.InstrAt(addr)
 }
 
 func (c Cpu) InstrAt(addr int) Instruction {
-    if addr % 2 != 0 {
-        panic("Invalid Program Address")
-    }
-    return NewInstruction(c.codeMem[addr], c.codeMem[addr+1])
+	if addr%2 != 0 {
+		panic("Invalid Program Address")
+	}
+
+	return NewInstruction(c.codeMem[addr], c.codeMem[addr+1])
 }
 
 func InitialProgramLoad(program string) Cpu {

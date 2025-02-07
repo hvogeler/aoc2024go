@@ -1,11 +1,13 @@
 package main
 
 import (
-	"day17/cpu"
+	cp "day17/cpu"
 	"fmt"
 )
 
 func main() {
-	data := cpu.ReadData("example1.dat")
-	fmt.Println(data)
+	data := cp.ReadData("testdata.dat")
+	cpu := cp.InitialProgramLoad(data)
+	fmt.Println(cpu.DisAssemble(-1))
+	cpu.Run()
 }
