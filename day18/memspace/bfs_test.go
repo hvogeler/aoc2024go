@@ -26,12 +26,17 @@ func Test_part2(t *testing.T) {
 		fmt.Println(ms)
 
 		inputArray := NewInputArray(data)
-		for i := 10; i < 14; i++ {
+		for i := 10; i < len(inputArray); i++ {
 			ms.CorruptMemAt(inputArray[i].x, inputArray[i].y)
 			ms.ResetBfsWalk()
 			fmt.Println(ms)
 			ms.BfsWalk()
 			fmt.Printf("Corrupted bytes: %d, Steps for shortest path: %d\n\n", i+1, ms.ExitNode().pathLen)
+			if ms.ExitNode().PathLen() < 0 {
+				fmt.Printf("Exit cannot be reached after %d. corrupted byte at %s\n", i, inputArray[i])
+				break
+			}
+	
 		}
 
 	})

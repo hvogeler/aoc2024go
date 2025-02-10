@@ -6,6 +6,16 @@ import (
 	"strings"
 )
 
+type InputArray Location
+
+func (ia InputArray) X() int {
+	return ia.x
+}
+
+func (ia InputArray) Y() int {
+	return ia.y
+}
+
 func NewInputArray(s string) []Location {
 	locs := []Location{}
 	scanner := bufio.NewScanner(strings.NewReader(s))
@@ -24,3 +34,4 @@ func NewInputArray(s string) []Location {
 	}
 	return locs
 }
+
