@@ -11,7 +11,7 @@ import (
 // because they include the 0 position.
 // For me a (6,6) grid would only havemax coords (5,5)
 type MemSpace struct {
-	MemLocations map[Location]MemLocation
+	memLocations map[Location]*MemLocation
 	dimensions   Dimensions
 }
 
@@ -22,8 +22,19 @@ type MemLocation struct {
 
 func NewMemspace(dimX int, dimY int) MemSpace {
 	return MemSpace{
-		MemLocations: make(map[Location]MemLocation),
+		memLocations: make(map[Location]*MemLocation),
 		dimensions:   Dimensions{dimX: dimX, dimY: dimY},
+	}
+}
+
+func (ms *MemSpace) GetAt(loc Location) *MemLocation {
+	memLoc, exists := ms.memLocations[loc]
+	if exists {
+		return memLoc
+	}
+	return &MemLocation{
+		memType: Unused,
+		pos:     loc,
 	}
 }
 
@@ -33,7 +44,7 @@ func (ms MemSpace) String() string {
 		var row strings.Builder
 		for x := 0; x < ms.dimensions.dimX; x++ {
 			loc := NewLocation(x, y)
-			memLoc, exists := ms.MemLocations[loc]
+			memLoc, exists := ms.memLocations[loc]
 			if exists {
 				row.WriteString(string(memLoc.memType))
 			} else {
@@ -48,11 +59,11 @@ func (ms MemSpace) String() string {
 
 func MemSpaceFromStr(s string, dimX, dimY int, maxCorrupted int) MemSpace {
 	spc := NewMemspace(dimX, dimY)
-	spc.MemLocations[NewLocation(0, 0)] = MemLocation{
+	spc.memLocations[NewLocation(0, 0)] = &MemLocation{
 		memType: Start,
 		pos:     NewLocation(0, 0),
 	}
-	spc.MemLocations[NewLocation(dimX-1, dimY-1)] = MemLocation{
+	spc.memLocations[NewLocation(dimX-1, dimY-1)] = &MemLocation{
 		memType: Exit,
 		pos:     NewLocation(dimX-1, dimY-1),
 	}
@@ -70,7 +81,7 @@ func MemSpaceFromStr(s string, dimX, dimY int, maxCorrupted int) MemSpace {
 			panic("Invalid Coordinate Numeric")
 		}
 		loc := NewLocation(x, y)
-		spc.MemLocations[loc] = MemLocation{
+		spc.memLocations[loc] = &MemLocation{
 			memType: Corrupt,
 			pos:     loc,
 		}
