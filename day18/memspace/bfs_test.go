@@ -19,6 +19,46 @@ func Test_bfs(t *testing.T) {
 	})
 }
 
+func Test_part2(t *testing.T) {
+	t.Run("Part2", func(t *testing.T) {
+		data := ReadData("../example1.dat")
+		ms := MemSpaceFromStr(data, 7, 7, 10)
+		fmt.Println(ms)
+
+		inputArray := NewInputArray(data)
+		for i := 10; i < 14; i++ {
+			ms.CorruptMemAt(inputArray[i].x, inputArray[i].y)
+			ms.ResetBfsWalk()
+			fmt.Println(ms)
+			ms.BfsWalk()
+			fmt.Printf("Corrupted bytes: %d, Steps for shortest path: %d\n\n", i+1, ms.ExitNode().pathLen)
+		}
+
+	})
+
+	t.Run("InputArray", func(t *testing.T) {
+		data := ReadData("../example1.dat")
+		fmt.Println(data)
+		inputArray := NewInputArray(data)
+
+		fmt.Println(inputArray)
+		if len(inputArray) != 25 {
+			t.Errorf("Expected input Array len 25, got %d", len(inputArray))
+		}
+	})
+
+	t.Run("InputArray testdata", func(t *testing.T) {
+		data := ReadData("../testdata.dat")
+		fmt.Println(data)
+		inputArray := NewInputArray(data)
+
+		fmt.Println(inputArray)
+		if len(inputArray) != 3450 {
+			t.Errorf("Expected input Array len 3450, got %d", len(inputArray))
+		}
+	})
+}
+
 func Test_neighbors(t *testing.T) {
 	t.Run("Neighbors", func(t *testing.T) {
 		data := ReadData("../example1.dat")
@@ -55,5 +95,5 @@ func Test_neighbors(t *testing.T) {
 		if n2[1].memType != Corrupt || n2[2].memType != Corrupt {
 			t.Errorf("Incorrect Neighbor Type")
 		}
-})
+	})
 }

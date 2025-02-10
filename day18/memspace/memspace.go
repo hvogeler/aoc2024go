@@ -30,6 +30,11 @@ func NewMemLocation(loc Location, memType MemType) *MemLocation {
 	}
 }
 
+func (ms *MemSpace) CorruptMemAt(x, y int) {
+	pos := NewLocation(x, y)
+	ms.memLocations[pos] = NewMemLocation(pos, Corrupt)
+}
+
 func (ms *MemLocation) IsVisited() bool {
 	return ms.pathLen >= 0
 }

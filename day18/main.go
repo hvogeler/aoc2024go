@@ -12,6 +12,8 @@ func main() {
 	fmt.Println(ms)
 	ms.BfsWalk()
 	fmt.Printf("Steps for shortest path: %d\n", ms.ExitNode().PathLen())
+	// Part 438 steps
 
+	
 }
 
