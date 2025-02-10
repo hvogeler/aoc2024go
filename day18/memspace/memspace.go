@@ -18,6 +18,24 @@ type MemSpace struct {
 type MemLocation struct {
 	memType MemType
 	pos     Location
+	pathLen int
+	prev    *MemLocation
+}
+
+func NewMemLocation(loc Location, memType MemType) *MemLocation {
+	return &MemLocation{
+		memType: memType,
+		pos:     loc,
+		pathLen: -1,
+	}
+}
+
+func (ms *MemLocation) IsVisited() bool {
+	return ms.pathLen >= 0
+}
+
+func (ml MemLocation) PathLen() int {
+	return ml.pathLen
 }
 
 func NewMemspace(dimX int, dimY int) MemSpace {
@@ -27,15 +45,26 @@ func NewMemspace(dimX int, dimY int) MemSpace {
 	}
 }
 
+func (ms *MemSpace) GetAtPos(x, y int) *MemLocation {
+	return ms.GetAt(NewLocation(x, y))
+}
+
 func (ms *MemSpace) GetAt(loc Location) *MemLocation {
 	memLoc, exists := ms.memLocations[loc]
 	if exists {
 		return memLoc
 	}
-	return &MemLocation{
-		memType: Unused,
-		pos:     loc,
-	}
+	newMemLoc := NewMemLocation(loc, Unused)
+	ms.memLocations[loc] = newMemLoc
+	return ms.memLocations[loc]
+}
+
+func (ms *MemSpace) StartNode() *MemLocation {
+	return ms.memLocations[NewLocation(0, 0)]
+}
+
+func (ms *MemSpace) ExitNode() *MemLocation {
+	return ms.memLocations[NewLocation(ms.dimensions.dimX-1, ms.dimensions.dimY-1)]
 }
 
 func (ms MemSpace) String() string {
@@ -59,14 +88,10 @@ func (ms MemSpace) String() string {
 
 func MemSpaceFromStr(s string, dimX, dimY int, maxCorrupted int) MemSpace {
 	spc := NewMemspace(dimX, dimY)
-	spc.memLocations[NewLocation(0, 0)] = &MemLocation{
-		memType: Start,
-		pos:     NewLocation(0, 0),
-	}
-	spc.memLocations[NewLocation(dimX-1, dimY-1)] = &MemLocation{
-		memType: Exit,
-		pos:     NewLocation(dimX-1, dimY-1),
-	}
+	spc.memLocations[NewLocation(0, 0)] = NewMemLocation(NewLocation(0, 0), Start)
+	spc.memLocations[NewLocation(0, 0)].pathLen = 0
+
+	spc.memLocations[NewLocation(dimX-1, dimY-1)] = NewMemLocation(NewLocation(dimX-1, dimY-1), Exit)
 
 	scanner := bufio.NewScanner(strings.NewReader(s))
 	for n := 0; scanner.Scan() && n < maxCorrupted; n++ {
@@ -81,10 +106,7 @@ func MemSpaceFromStr(s string, dimX, dimY int, maxCorrupted int) MemSpace {
 			panic("Invalid Coordinate Numeric")
 		}
 		loc := NewLocation(x, y)
-		spc.memLocations[loc] = &MemLocation{
-			memType: Corrupt,
-			pos:     loc,
-		}
+		spc.memLocations[loc] = NewMemLocation(loc, Corrupt)
 	}
 	return spc
 }
@@ -96,6 +118,7 @@ const (
 	Exit    MemType = "E"
 	Corrupt MemType = "#"
 	Unused  MemType = "."
+	Visited MemType = "O"
 )
 
 type Dimensions struct {
