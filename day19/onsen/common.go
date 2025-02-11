@@ -1,4 +1,4 @@
-package towel
+package onsen
 
 import "os"
 
