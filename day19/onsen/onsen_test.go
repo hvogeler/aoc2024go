@@ -5,6 +5,19 @@ import (
 	"testing"
 )
 
+func Test_long_patterns(t *testing.T) {
+	t.Run("Check Designs largest sub wrong", func(t *testing.T) {
+		data := ReadData("../example2.dat")
+		fmt.Println(data)
+		onsen := OnsenFromStr(data)
+		d := onsen.CheckDesign(onsen.designs[0])
+		fmt.Println(d)
+		if !d.isPossible {
+			t.Errorf("Is Possible: bw, up, bw")
+		}
+	})
+}
+
 func Test_all_patterns(t *testing.T) {
 	t.Run("Check Designs1", func(t *testing.T) {
 		data := ReadData("../example1.dat")
@@ -12,7 +25,7 @@ func Test_all_patterns(t *testing.T) {
 		onsen := OnsenFromStr(data)
 		onsen.CheckDesigns()
 		all, possible, impossible := onsen.CountDesigns()
-		
+
 		if all != 8 {
 			t.Errorf("Count All wrong")
 		}
